@@ -12,6 +12,12 @@ const PORT = Number(process.env.PORT) || 3001;
 const projectRoot = process.cwd();
 const publicDir = path.join(projectRoot, 'public');
 const DB_FILE = path.join(projectRoot, 'data.json');
+const isProduction = process.env.NODE_ENV === 'production';
+const googleEnabled = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+
+if (isProduction) {
+  app.set('trust proxy', 1);
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -20,7 +26,11 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'renounce-session-secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false }
+  cookie: {
+    secure: isProduction,
+    sameSite: isProduction ? 'lax' : 'lax',
+    maxAge: 1000 * 60 * 60 * 24 * 7
+  }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -162,36 +172,40 @@ passport.use(new LocalStrategy({ usernameField: 'email' }, async (email, passwor
   }
 }));
 
-passport.use(new GoogleStrategy({
-  clientID: process.env.GOOGLE_CLIENT_ID || 'demo-google-client-id',
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'demo-google-client-secret',
-  callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3001/api/auth/google/callback'
-}, async (accessToken, refreshToken, profile, done) => {
-  try {
-    const data = readData();
-    const email = profile.emails?.[0]?.value?.toLowerCase() || '';
-    let user = data.users.find((entry) => entry.googleId === profile.id || entry.email === email);
+if (googleEnabled) {
+  passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3001/api/auth/google/callback'
+  }, async (accessToken, refreshToken, profile, done) => {
+    try {
+      const data = readData();
+      const email = profile.emails?.[0]?.value?.toLowerCase() || '';
+      let user = data.users.find((entry) => entry.googleId === profile.id || entry.email === email);
 
-    if (!user) {
-      user = createUserRecord({
-        email,
-        googleId: profile.id,
-        name: profile.displayName || 'Google User'
-      });
-      data.users.push(user);
-      writeData(data);
-    } else {
-      user.googleId = profile.id;
-      user.name = profile.displayName || user.name;
-      user.email = email || user.email;
-      writeData(data);
+      if (!user) {
+        user = createUserRecord({
+          email,
+          googleId: profile.id,
+          name: profile.displayName || 'Google User'
+        });
+        data.users.push(user);
+        writeData(data);
+      } else {
+        user.googleId = profile.id;
+        user.name = profile.displayName || user.name;
+        user.email = email || user.email;
+        writeData(data);
+      }
+
+      done(null, normalizeUser(user));
+    } catch (error) {
+      done(error);
     }
-
-    done(null, normalizeUser(user));
-  } catch (error) {
-    done(error);
-  }
-}));
+  }));
+} else {
+  console.warn('Google OAuth credentials not configured. Google auth route will be disabled until env vars are provided.');
+}
 
 app.get('/', (req, res) => {
   if (req.isAuthenticated()) {
@@ -257,8 +271,19 @@ app.post('/api/auth/logout', (req, res, next) => {
   });
 });
 
-app.get('/api/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-app.get('/api/auth/google/callback', passport.authenticate('google', { failureRedirect: '/auth.html?error=google' }), (req, res) => {
+app.get('/api/auth/google', (req, res, next) => {
+  if (!googleEnabled) {
+    return res.status(503).json({ error: 'Google auth is not configured.' });
+  }
+  return passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+});
+
+app.get('/api/auth/google/callback', (req, res, next) => {
+  if (!googleEnabled) {
+    return res.status(503).json({ error: 'Google auth is not configured.' });
+  }
+  return passport.authenticate('google', { failureRedirect: '/auth.html?error=google' })(req, res, next);
+}, (req, res) => {
   res.redirect('/');
 });
 
