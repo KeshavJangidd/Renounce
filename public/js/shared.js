@@ -17,7 +17,10 @@
 
   const headerMarkup = `
     <header class="site-header">
-      <a class="brand" href="index.html">Renounce</a>
+      <a class="brand" href="index.html">
+        <img class="brand-mascot" src="images/mascot.svg" alt="Renounce mascot" />
+        <span>Renounce</span>
+      </a>
       <div class="header-actions">
         <nav class="nav-links" aria-label="Primary navigation">
           <a href="index.html">Dashboard</a>
