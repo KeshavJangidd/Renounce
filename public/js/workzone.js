@@ -70,7 +70,7 @@
     const payload = {};
     payload[key] = goals[key].value.trim();
     try {
-      const response = await fetch('/api/goals', {
+      const response = await apiFetch('/api/goals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -93,7 +93,7 @@
 
   async function loadGoals() {
     try {
-      const response = await fetch('/api/goals');
+      const response = await apiFetch('/api/goals');
       if (!response.ok) {
         throw new Error('Failed to load goals');
       }
@@ -109,7 +109,7 @@
   async function postSession() {
     const taskValue = goals.daily.value.trim() || 'Pomodoro session';
     try {
-      const response = await fetch('/api/sessions', {
+      const response = await apiFetch('/api/sessions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

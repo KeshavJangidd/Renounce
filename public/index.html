@@ -56,22 +56,22 @@
     <script>
       (function () {
         async function fetchSessions() {
-          const res = await fetch('/api/sessions');
+          const res = await apiFetch('/api/sessions');
           return res.json();
         }
 
         async function fetchDeadlines() {
-          const res = await fetch('/api/deadlines');
+          const res = await apiFetch('/api/deadlines');
           return res.json();
         }
 
         async function fetchMood() {
-          const res = await fetch('/api/mood');
+          const res = await apiFetch('/api/mood');
           return res.json();
         }
 
         async function saveMood(mood) {
-          await fetch('/api/mood', {
+          await apiFetch('/api/mood', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ mood })

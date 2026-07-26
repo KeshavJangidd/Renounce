@@ -4,16 +4,22 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const path = require('path');
 const fs = require('fs');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 const projectRoot = process.cwd();
-const publicDir = path.join(projectRoot, 'public');
 const DB_FILE = path.join(projectRoot, 'data.json');
 const isProduction = process.env.NODE_ENV === 'production';
 const googleEnabled = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+const frontendUrl = process.env.FRONTEND_URL || 'https://renouncework.vercel.app';
+const allowedOrigins = new Set([
+  frontendUrl,
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001'
+]);
 
 if (isProduction) {
   app.set('trust proxy', 1);
@@ -21,14 +27,24 @@ if (isProduction) {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(publicDir));
+app.use((req, res, next) => {
+  const origin = req.get('origin');
+  if (origin && allowedOrigins.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  return next();
+});
 app.use(session({
   secret: process.env.SESSION_SECRET || 'renounce-session-secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: isProduction,
-    sameSite: isProduction ? 'lax' : 'lax',
+    sameSite: isProduction ? 'none' : 'lax',
     maxAge: 1000 * 60 * 60 * 24 * 7
   }
 }));
@@ -115,20 +131,7 @@ function getUserRecord(req) {
 }
 
 function ensureAuthenticated(req, res, next) {
-  const publicPaths = [
-    '/',
-    '/auth.html',
-    '/favicon.ico',
-    '/api/health',
-    '/api/auth/login',
-    '/api/auth/signup',
-    '/api/auth/logout',
-    '/api/auth/me',
-    '/api/auth/google',
-    '/api/auth/google/callback'
-  ];
-
-  if (publicPaths.includes(req.path) || req.path.startsWith('/css/') || req.path.startsWith('/js/')) {
+  if (req.path === '/' || req.path.startsWith('/api/')) {
     return next();
   }
 
@@ -136,11 +139,7 @@ function ensureAuthenticated(req, res, next) {
     return next();
   }
 
-  if (req.accepts('html')) {
-    return res.redirect('/auth.html');
-  }
-
-  return res.status(401).json({ error: 'Authentication required' });
+  return res.status(404).json({ error: 'Not found' });
 }
 
 app.use(ensureAuthenticated);
@@ -208,10 +207,7 @@ if (googleEnabled) {
 }
 
 app.get('/', (req, res) => {
-  if (req.isAuthenticated()) {
-    return res.sendFile(path.join(publicDir, 'index.html'));
-  }
-  return res.redirect('/auth.html');
+  res.json({ name: 'Renounce API', status: 'ok' });
 });
 
 app.get('/api/health', (req, res) => {
@@ -282,9 +278,9 @@ app.get('/api/auth/google/callback', (req, res, next) => {
   if (!googleEnabled) {
     return res.status(503).json({ error: 'Google auth is not configured.' });
   }
-  return passport.authenticate('google', { failureRedirect: '/auth.html?error=google' })(req, res, next);
+  return passport.authenticate('google', { failureRedirect: `${frontendUrl}/auth.html?error=google` })(req, res, next);
 }, (req, res) => {
-  res.redirect('/');
+  res.redirect(frontendUrl);
 });
 
 app.get('/api/deadlines', (req, res) => {

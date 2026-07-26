@@ -21,7 +21,7 @@
   let currentTask = '';
 
   async function fetchSessions() {
-    const res = await fetch('/api/sessions');
+    const res = await apiFetch('/api/sessions');
     return res.json();
   }
 
@@ -31,7 +31,7 @@
       minutes: totalSeconds / 60,
       completed: type === 'completed'
     };
-    await fetch('/api/sessions', {
+    await apiFetch('/api/sessions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

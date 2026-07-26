@@ -4,6 +4,16 @@
   const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   const activeTheme = savedTheme || preferredTheme;
   document.documentElement.dataset.theme = activeTheme;
+  const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const apiBaseUrl = window.RENOUNCE_API_URL || (isLocalhost
+    ? (window.location.port === '3001' ? '' : 'http://localhost:3001')
+    : 'https://renounce.onrender.com');
+
+  window.apiUrl = (endpoint) => `${apiBaseUrl}${endpoint}`;
+  window.apiFetch = (endpoint, options = {}) => fetch(window.apiUrl(endpoint), {
+    ...options,
+    credentials: 'include'
+  });
 
   const headerMarkup = `
     <header class="site-header">

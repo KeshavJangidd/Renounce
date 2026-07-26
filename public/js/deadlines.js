@@ -8,12 +8,12 @@
   const list = document.getElementById('deadline-list');
 
   async function fetchDeadlines() {
-    const res = await fetch('/api/deadlines');
+    const res = await apiFetch('/api/deadlines');
     return res.json();
   }
 
   async function createDeadline(payload) {
-    const res = await fetch('/api/deadlines', {
+    const res = await apiFetch('/api/deadlines', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -22,7 +22,7 @@
   }
 
   async function updateDeadline(id, payload) {
-    const res = await fetch(`/api/deadlines/${id}`, {
+    const res = await apiFetch(`/api/deadlines/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -31,7 +31,7 @@
   }
 
   async function deleteDeadline(id) {
-    await fetch(`/api/deadlines/${id}`, { method: 'DELETE' });
+    await apiFetch(`/api/deadlines/${id}`, { method: 'DELETE' });
   }
 
   async function renderDeadlines() {
