@@ -18,7 +18,7 @@
   const headerMarkup = `
     <header class="site-header">
       <a class="brand" href="index.html">
-        <img class="brand-mascot" src="images/renounce-mascot.jpg" alt="Renounce mascot" />
+        <img class="brand-mascot" src="apple-touch-icon.png" alt="Renounce mascot" />
         <span>Renounce</span>
       </a>
       <div class="header-actions">
