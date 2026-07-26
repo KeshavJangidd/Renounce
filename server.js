@@ -1,12 +1,4 @@
-const express = require('express');
-const session = require('express-session');
-const bcrypt = require('bcrypt');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const fs = require('fs');
-
-const app = express();
+require('./src/server');
 const PORT = Number(process.env.PORT) || 3001;
 const projectRoot = process.cwd();
 const DB_FILE = path.join(projectRoot, 'data.json');
