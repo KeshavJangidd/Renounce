@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renounce Sign In</title>
+    <link rel="stylesheet" href="css/shared.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="card" style="max-width: 520px; margin: 2rem auto;">
+        <p class="eyebrow">Welcome</p>
+        <h1>Sign in to Renounce</h1>
+        <p class="hero-copy">Create an account or use Google to keep your study data private and personal.</p>
+        <form id="signup-form" class="stack">
+          <label>
+            Name
+            <input id="signup-name" type="text" placeholder="Your name" />
+          </label>
+          <label>
+            Email
+            <input id="signup-email" type="email" required />
+          </label>
+          <label>
+            Password
+            <input id="signup-password" type="password" required />
+          </label>
+          <button class="btn btn-primary" type="submit">Create account</button>
+        </form>
+        <hr />
+        <form id="login-form" class="stack">
+          <label>
+            Email
+            <input id="login-email" type="email" required />
+          </label>
+          <label>
+            Password
+            <input id="login-password" type="password" required />
+          </label>
+          <button class="btn btn-secondary" type="submit">Sign in</button>
+        </form>
+        <div class="button-row" style="margin-top: 1rem;">
+          <a class="btn btn-ghost" href="/api/auth/google">Sign in with Google</a>
+        </div>
+        <p id="auth-message" class="timer-status"></p>
+      </section>
+    </main>
+
+    <script>
+      async function postJson(url, body) {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Request failed');
+        }
+        return data;
+      }
+
+      document.getElementById('signup-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const message = document.getElementById('auth-message');
+        try {
+          await postJson('/api/auth/signup', {
+            name: document.getElementById('signup-name').value,
+            email: document.getElementById('signup-email').value,
+            password: document.getElementById('signup-password').value
+          });
+          message.textContent = 'Account created. Redirecting...';
+          window.location.href = '/';
+        } catch (error) {
+          message.textContent = error.message;
+        }
+      });
+
+      document.getElementById('login-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const message = document.getElementById('auth-message');
+        try {
+          await postJson('/api/auth/login', {
+            email: document.getElementById('login-email').value,
+            password: document.getElementById('login-password').value
+          });
+          message.textContent = 'Signed in. Redirecting...';
+          window.location.href = '/';
+        } catch (error) {
+          message.textContent = error.message;
+        }
+      });
+    </script>
+  </body>
+</html>

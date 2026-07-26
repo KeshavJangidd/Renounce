@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renounce Timer</title>
+    <link rel="stylesheet" href="css/shared.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="card timer-layout">
+        <div class="timer-panel">
+          <p class="eyebrow">Focus timer</p>
+          <h1>Protect a calm work session.</h1>
+          <form id="timer-form" class="stack">
+            <label>
+              Task
+              <input id="task-input" name="task" type="text" placeholder="e.g. Review lecture notes" required />
+            </label>
+            <label>
+              Duration
+              <select id="duration-select" name="duration">
+                <option value="15">15 min</option>
+                <option value="25" selected>25 min</option>
+                <option value="45">45 min</option>
+                <option value="60">60 min</option>
+              </select>
+            </label>
+            <div class="button-row">
+              <button class="btn btn-primary" type="submit">Start</button>
+              <button class="btn btn-secondary" type="button" id="pause-btn">Pause</button>
+              <button class="btn btn-ghost" type="button" id="abandon-btn">Abandon</button>
+            </div>
+          </form>
+          <div class="session-log">
+            <p id="status-text">Choose a task and start your timer.</p>
+            <p id="session-count">Sessions logged: 0</p>
+          </div>
+        </div>
+
+        <div class="timer-visual">
+          <svg class="progress-ring" viewBox="0 0 120 120" aria-label="Timer progress ring">
+            <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+            <circle class="ring-progress" id="ring-progress" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="tree-stage">
+            <div id="tree" class="tree"></div>
+          </div>
+          <p id="time-display" class="time-display">25:00</p>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/shared.js"></script>
+    <script src="js/timer.js"></script>
+  </body>
+</html>

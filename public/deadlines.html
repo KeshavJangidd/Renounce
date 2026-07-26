@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renounce Deadlines</title>
+    <link rel="stylesheet" href="css/shared.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Deadline tracker</p>
+            <h1>Keep your obligations visible.</h1>
+          </div>
+        </div>
+
+        <form id="deadline-form" class="stack form-grid">
+          <input id="deadline-id" type="hidden" />
+          <label>
+            Title
+            <input id="deadline-title" type="text" required />
+          </label>
+          <label>
+            Due date
+            <input id="deadline-date" type="date" required />
+          </label>
+          <label>
+            Category
+            <select id="deadline-category">
+              <option value="exam">Exam</option>
+              <option value="assignment">Assignment</option>
+              <option value="project">Project</option>
+            </select>
+          </label>
+          <div class="button-row">
+            <button class="btn btn-primary" type="submit">Save deadline</button>
+            <button class="btn btn-secondary" type="button" id="cancel-edit">Cancel</button>
+          </div>
+        </form>
+
+        <div id="deadline-list" class="list-card-stack"></div>
+      </section>
+    </main>
+
+    <script src="js/shared.js"></script>
+    <script src="js/deadlines.js"></script>
+  </body>
+</html>

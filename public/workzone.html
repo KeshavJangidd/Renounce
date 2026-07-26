@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renounce Work Zone</title>
+    <link rel="stylesheet" href="css/shared.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="card workzone-grid">
+        <div class="card inner-card">
+          <p class="eyebrow">Goals</p>
+          <h1>Set your gentle direction.</h1>
+          <div class="stack">
+            <label class="goal-field">
+              <span>Long-term goal</span>
+              <input id="goal-long-term" type="text" placeholder="Build a calm, sustainable study rhythm" />
+            </label>
+            <label class="goal-field">
+              <span>This week's goal</span>
+              <input id="goal-weekly" type="text" placeholder="Finish two focused review sessions" />
+            </label>
+            <label class="goal-field">
+              <span>Today's goal</span>
+              <input id="goal-daily" type="text" placeholder="Complete one deep work block before dinner" />
+            </label>
+          </div>
+        </div>
+
+        <div class="card inner-card">
+          <p class="eyebrow">Pomodoro</p>
+          <h2>Stay with the next small step.</h2>
+          <div class="timer-display">
+            <div class="timer-visual">
+              <svg class="progress-ring" viewBox="0 0 120 120" aria-label="Pomodoro progress ring">
+                <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+                <circle class="ring-progress" id="pomodoro-ring" cx="60" cy="60" r="52"></circle>
+              </svg>
+            </div>
+            <div>
+              <p class="phase-pill" id="phase-label">Work</p>
+              <p class="timer-countdown" id="timer-countdown">25:00</p>
+              <p class="timer-status" id="timer-status">Ready to begin.</p>
+              <div class="button-row">
+                <button class="btn btn-primary" id="start-btn" type="button">Start</button>
+                <button class="btn btn-secondary" id="pause-btn" type="button">Pause</button>
+                <button class="btn btn-ghost" id="skip-btn" type="button">Skip</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/shared.js"></script>
+    <script src="js/workzone.js"></script>
+  </body>
+</html>

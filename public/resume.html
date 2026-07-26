@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renounce Resume</title>
+    <link rel="stylesheet" href="css/shared.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Resume draft</p>
+            <h1>Turn your momentum into polished bullets.</h1>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="card inner-card">
+            <p class="eyebrow">Suggested bullets</p>
+            <div id="bullet-list" class="stack"></div>
+          </div>
+          <div class="card inner-card">
+            <p class="eyebrow">Approve or edit</p>
+            <form id="resume-form" class="stack">
+              <textarea id="resume-bullets" rows="8"></textarea>
+              <div class="button-row">
+                <button class="btn btn-primary" type="submit">Save draft</button>
+                <button class="btn btn-secondary" type="button" id="generate-bullets">Generate again</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="js/shared.js"></script>
+    <script>
+      (function () {
+        const sessionsKey = 'renounce_sessions';
+        const deadlinesKey = 'renounce_deadlines';
+        const resumeKey = 'renounce_resume_bullets';
+
+        function readStorage(key, fallback = []) {
+          try {
+            return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+          } catch (error) {
+            console.warn('Could not read localStorage', error);
+            return fallback;
+          }
+        }
+
+        function saveStorage(key, value) {
+          localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function createBullets(sessions, deadlines) {
+          const completedSessions = sessions.filter((session) => session.type === 'completed');
+          const finishedDeadlines = deadlines.filter((deadline) => deadline.isCompleted);
+          const bullets = [];
+          if (completedSessions.length) {
+            bullets.push(`Completed ${completedSessions.length} focus sessions with a steady, distraction-aware routine.`);
+          }
+          if (finishedDeadlines.length) {
+            bullets.push(`Delivered ${finishedDeadlines.length} finished deadlines across coursework and projects.`);
+          }
+          if (completedSessions.length && finishedDeadlines.length) {
+            bullets.push('Balanced deep work and deadline follow-through while keeping a calm, organized study rhythm.');
+          }
+          if (!bullets.length) {
+            bullets.push('Built a sustainable study routine with consistent time-blocking and reflection.');
+          }
+          return bullets;
+        }
+
+        function renderBullets(bullets) {
+          const container = document.getElementById('bullet-list');
+          container.innerHTML = bullets
+            .map((bullet) => `<div class="resume-bullet">${bullet}</div>`)
+            .join('');
+          document.getElementById('resume-bullets').value = bullets.join('\n');
+        }
+
+        function init() {
+          const sessions = readStorage(sessionsKey, []);
+          const deadlines = readStorage(deadlinesKey, []);
+          const savedBullets = readStorage(resumeKey, []);
+          const bullets = savedBullets.length ? savedBullets : createBullets(sessions, deadlines);
+          renderBullets(bullets);
+
+          document.getElementById('resume-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const nextBullets = document.getElementById('resume-bullets').value
+              .split('\n')
+              .map((line) => line.trim())
+              .filter(Boolean);
+            saveStorage(resumeKey, nextBullets);
+            renderBullets(nextBullets);
+          });
+
+          document.getElementById('generate-bullets').addEventListener('click', () => {
+            const generated = createBullets(readStorage(sessionsKey, []), readStorage(deadlinesKey, []));
+            renderBullets(generated);
+            saveStorage(resumeKey, generated);
+          });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+      })();
+    </script>
+  </body>
+</html>

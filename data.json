@@ -1,0 +1,34 @@
+{
+  "users": [
+    {
+      "id": "user-1785049205258-srw4hw",
+      "email": "legacy@renounce.local",
+      "passwordHash": null,
+      "googleId": null,
+      "name": "Legacy User",
+      "deadlines": [],
+      "sessions": [],
+      "mood": null,
+      "goals": {
+        "longTerm": "",
+        "weekly": "",
+        "daily": "Ship the first draft"
+      }
+    },
+    {
+      "id": "user-1785049205317-pfhh1l",
+      "email": "demo@renounce.local",
+      "passwordHash": "$2b$10$O.YPFa5Irjy7q4P7IKCtLOiXLP5l.hXnI0bLV/g9xPt8ped4SPzZi",
+      "googleId": null,
+      "name": "Demo User",
+      "deadlines": [],
+      "sessions": [],
+      "mood": null,
+      "goals": {
+        "longTerm": "",
+        "weekly": "",
+        "daily": ""
+      }
+    }
+  ]
+}

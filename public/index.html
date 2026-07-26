@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renounce Dashboard</title>
+    <link rel="stylesheet" href="css/shared.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero-card card">
+        <p class="eyebrow">Today’s focus</p>
+        <h1>Welcome back, student.</h1>
+        <p class="hero-copy">
+          A steady day beats a perfect one. Pick the next step and keep momentum gentle.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="timer.html">Start a session</a>
+          <a class="btn btn-secondary" href="deadlines.html">View deadlines</a>
+        </div>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="card stat-card">
+          <p class="eyebrow">Suggested task</p>
+          <h2 id="suggested-task">Finish a 25-minute deep work block</h2>
+          <p id="suggested-task-meta">Use the timer to protect your next study window.</p>
+        </article>
+
+        <article class="card stat-card">
+          <p class="eyebrow">Upcoming deadlines</p>
+          <ul id="upcoming-deadlines" class="list-stack"></ul>
+        </article>
+
+        <article class="card stat-card">
+          <p class="eyebrow">Current streak</p>
+          <h2 id="streak-count">0 days</h2>
+          <p>Keep the rhythm alive by showing up each day.</p>
+        </article>
+
+        <article class="card stat-card mood-card">
+          <p class="eyebrow">Quick mood check-in</p>
+          <div class="mood-options" id="mood-options">
+            <button class="mood-btn" data-mood="calm">Calm</button>
+            <button class="mood-btn" data-mood="focused">Focused</button>
+            <button class="mood-btn" data-mood="overwhelmed">Overwhelmed</button>
+          </div>
+          <p id="mood-status">Tap a feeling to save your current energy.</p>
+        </article>
+      </section>
+    </main>
+
+    <script src="js/shared.js"></script>
+    <script>
+      (function () {
+        async function fetchSessions() {
+          const res = await fetch('/api/sessions');
+          return res.json();
+        }
+
+        async function fetchDeadlines() {
+          const res = await fetch('/api/deadlines');
+          return res.json();
+        }
+
+        async function fetchMood() {
+          const res = await fetch('/api/mood');
+          return res.json();
+        }
+
+        async function saveMood(mood) {
+          await fetch('/api/mood', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mood })
+          });
+        }
+
+        function getStreak(sessions) {
+          const completedDates = new Set(
+            sessions
+              .filter((session) => session.completed)
+              .map((session) => session.date?.slice(0, 10))
+              .filter(Boolean)
+          );
+
+          let streak = 0;
+          const cursor = new Date();
+          for (let i = 0; i < 30; i += 1) {
+            const candidate = new Date(cursor);
+            candidate.setDate(cursor.getDate() - i);
+            const key = candidate.toISOString().slice(0, 10);
+            if (completedDates.has(key)) {
+              streak += 1;
+            } else if (i > 0) {
+              break;
+            }
+          }
+          return streak;
+        }
+
+        function renderSuggestedTask(deadlines) {
+          const taskEl = document.getElementById('suggested-task');
+          const metaEl = document.getElementById('suggested-task-meta');
+          const nextDeadline = deadlines
+            .filter((deadline) => !deadline.isCompleted)
+            .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
+
+          if (nextDeadline) {
+            taskEl.textContent = `Prepare ${nextDeadline.title}`;
+            metaEl.textContent = `Due ${new Date(nextDeadline.dueDate).toLocaleDateString()} · ${nextDeadline.category}`;
+          } else {
+            taskEl.textContent = 'Finish a 25-minute deep work block';
+            metaEl.textContent = 'Use the timer to protect your next study window.';
+          }
+        }
+
+        function renderDeadlines(deadlines) {
+          const list = document.getElementById('upcoming-deadlines');
+          const upcoming = deadlines
+            .filter((deadline) => !deadline.isCompleted)
+            .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+            .slice(0, 3);
+
+          if (!upcoming.length) {
+            list.innerHTML = '<li>No upcoming deadlines yet.</li>';
+            return;
+          }
+
+          list.innerHTML = upcoming
+            .map((deadline) => `<li><strong>${deadline.title}</strong><br />${new Date(deadline.dueDate).toLocaleDateString()} · ${deadline.category}</li>`)
+            .join('');
+        }
+
+        function renderMood(mood) {
+          const status = document.getElementById('mood-status');
+          if (mood && mood.value) {
+            status.textContent = `Saved mood: ${mood.value.charAt(0).toUpperCase() + mood.value.slice(1)}.`;
+          }
+        }
+
+        async function init() {
+          const [sessions, deadlines, mood] = await Promise.all([
+            fetchSessions(),
+            fetchDeadlines(),
+            fetchMood()
+          ]);
+
+          document.getElementById('streak-count').textContent = `${getStreak(sessions)} days`;
+          renderSuggestedTask(deadlines);
+          renderDeadlines(deadlines);
+          renderMood(mood);
+
+          document.querySelectorAll('.mood-btn').forEach((button) => {
+            button.addEventListener('click', async () => {
+              const mood = button.getAttribute('data-mood');
+              await saveMood(mood);
+              document.getElementById('mood-status').textContent = `Saved mood: ${mood.charAt(0).toUpperCase() + mood.slice(1)}.`;
+            });
+          });
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+      })();
+    </script>
+  </body>
+</html>
