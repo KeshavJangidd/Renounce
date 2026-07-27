@@ -29,6 +29,21 @@
         "weekly": "",
         "daily": ""
       }
+    },
+    {
+      "id": "user-1785142170834-3kc2kf",
+      "email": "keshavjangid2800@gmail.com",
+      "passwordHash": "$2b$10$/N.zjfR0/5PVGFLu93DyEe5xUM5xbK.TU8ofoJrA8M8XtOfoucSeC",
+      "googleId": null,
+      "name": "Keshav Jangid",
+      "deadlines": [],
+      "sessions": [],
+      "mood": null,
+      "goals": {
+        "longTerm": "",
+        "weekly": "",
+        "daily": ""
+      }
     }
   ]
 }
