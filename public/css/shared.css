@@ -17,6 +17,17 @@
   --max-width: 1180px;
 }
 
+.account-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: .4rem .8rem;
+  border-radius: 999px;
+  background: var(--green-pale);
+  color: var(--green);
+  font-size: .78rem;
+  font-weight: 700;
+}
+
 [data-theme="dark"] {
   color-scheme: dark;
   --ink: #dcdae8;

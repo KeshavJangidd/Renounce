@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renounce — Account</title>
+    <link rel="stylesheet" href="css/shared.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero-card card" style="min-height:auto;">
+        <p class="eyebrow">Your account</p>
+        <h1 id="account-name">Renounce User</h1>
+        <p class="hero-copy" id="account-email">—</p>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="card stat-card inner-card" style="grid-column: span 6;">
+          <p class="eyebrow">Profile</p>
+          <div class="stack">
+            <label>Name
+              <input type="text" id="name-input" />
+            </label>
+            <label>Preferred session length (minutes)
+              <select id="default-duration">
+                <option value="15">15</option>
+                <option value="25" selected>25</option>
+                <option value="45">45</option>
+                <option value="60">60</option>
+              </select>
+            </label>
+            <button class="btn btn-primary" id="save-btn">Save changes</button>
+            <p id="save-status" class="muted"></p>
+          </div>
+        </article>
+
+        <article class="card stat-card inner-card" style="grid-column: span 6;">
+          <p class="eyebrow">Session</p>
+          <p class="muted">Signed in with <span id="account-provider">email</span>.</p>
+          <button class="btn btn-secondary" id="logout-btn">Log out</button>
+        </article>
+      </section>
+    </main>
+
+    <script src="js/shared.js"></script>
+    <script>
+      (async function () {
+        const nameInput = document.getElementById('name-input');
+        const durationSelect = document.getElementById('default-duration');
+        const saveStatus = document.getElementById('save-status');
+
+        const res = await apiFetch('/api/auth/me');
+        if (!res.ok) {
+          window.location.href = '/login.html';
+          return;
+        }
+        const user = await res.json();
+
+        document.getElementById('account-name').textContent = user.name || 'Renounce User';
+        document.getElementById('account-email').textContent = user.email || '';
+        document.getElementById('account-provider').textContent = user.googleId ? 'Google' : 'email';
+        nameInput.value = user.name || '';
+        if (user.preferences?.defaultDuration) {
+          durationSelect.value = user.preferences.defaultDuration;
+        }
+
+        document.getElementById('save-btn').addEventListener('click', async () => {
+          const res = await apiFetch('/api/auth/me', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: nameInput.value.trim(),
+              preferences: { defaultDuration: durationSelect.value }
+            })
+          });
+          saveStatus.textContent = res.ok ? 'Saved.' : 'Could not save changes.';
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+          await apiFetch('/api/auth/logout', { method: 'POST' });
+          window.location.href = '/login.html';
+        });
+      })();
+    </script>
+  </body>
+</html>

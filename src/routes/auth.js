@@ -18,7 +18,8 @@ function normalizeUser(rawUser) {
     deadlines: Array.isArray(rawUser.deadlines) ? rawUser.deadlines : [],
     sessions: Array.isArray(rawUser.sessions) ? rawUser.sessions : [],
     mood: rawUser.mood || null,
-    goals: rawUser.goals || { longTerm: '', weekly: '', daily: '' }
+    goals: rawUser.goals || { longTerm: '', weekly: '', daily: '' },
+    preferences: rawUser.preferences || {}
   };
 }
 
@@ -32,7 +33,8 @@ function createUserRecord({ email, passwordHash = null, googleId = null, name })
     deadlines: [],
     sessions: [],
     mood: null,
-    goals: { longTerm: '', weekly: '', daily: '' }
+    goals: { longTerm: '', weekly: '', daily: '' },
+    preferences: {}
   });
 }
 
@@ -105,6 +107,24 @@ if (googleEnabled) {
 router.get('/me', (req, res) => {
   if (!req.isAuthenticated()) return res.status(401).json({ error: 'Not authenticated' });
   return res.json(sanitizeUser(req.user));
+});
+
+router.patch('/me', (req, res) => {
+  if (!req.isAuthenticated()) return res.status(401).json({ error: 'Not authenticated' });
+
+  const data = loadStorage();
+  const user = data.users.find((entry) => entry.id === req.user.id);
+  if (!user) return res.status(404).json({ error: 'Not found' });
+
+  if (req.body.name !== undefined) {
+    user.name = req.body.name.trim() || user.name;
+  }
+  if (req.body.preferences) {
+    user.preferences = { ...user.preferences, ...req.body.preferences };
+  }
+
+  saveStorage(data);
+  return res.json(sanitizeUser(user));
 });
 
 router.post('/signup', async (req, res, next) => {

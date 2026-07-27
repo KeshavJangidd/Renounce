@@ -30,7 +30,9 @@
           <a href="resume.html">Resume</a>
           <a href="workzone.html">Work Zone</a>
           <a href="talk.html">Talk to Kavir</a>
+          <a href="account.html">Account</a>
         </nav>
+        <span class="account-pill" id="account-pill" style="display:none;"></span>
         <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
           <span class="theme-toggle-icon" aria-hidden="true">☾</span>
         </button>
@@ -76,4 +78,17 @@
     localStorage.setItem(themeStorageKey, nextTheme);
     updateThemeToggle(nextTheme);
   });
+
+  // Show logged-in user's name in the nav, linking to account.html
+  if (currentPath !== 'login.html') {
+    window.apiFetch('/api/auth/me').then((res) => {
+      if (!res.ok) return;
+      return res.json();
+    }).then((user) => {
+      if (!user) return;
+      const pill = document.getElementById('account-pill');
+      pill.textContent = user.name || user.email;
+      pill.style.display = 'inline-flex';
+    }).catch(() => {});
+  }
 })();
