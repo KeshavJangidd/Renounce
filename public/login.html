@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renounce — Sign in</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
+    <link rel="stylesheet" href="css/shared.css" />
+    <style>
+      .auth-shell {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 2rem;
+      }
+      .auth-card {
+        width: min(420px, 100%);
+        padding: 2.2rem;
+      }
+      .auth-toggle {
+        display: flex;
+        gap: .4rem;
+        margin-bottom: 1.4rem;
+        padding: .3rem;
+        border-radius: 12px;
+        background: rgba(255,255,255,.04);
+        border: 1px solid var(--line);
+      }
+      .auth-toggle button {
+        flex: 1;
+        padding: .6rem;
+        border: none;
+        border-radius: 9px;
+        background: transparent;
+        color: var(--ink-soft);
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .auth-toggle button.active {
+        background: var(--green-pale);
+        color: var(--green);
+      }
+      .auth-field { display: grid; gap: .4rem; margin-bottom: 1rem; }
+      .auth-error {
+        display: none;
+        margin-bottom: 1rem;
+        padding: .7rem .9rem;
+        border-radius: 10px;
+        background: rgba(236,72,153,.1);
+        border: 1px solid rgba(236,72,153,.3);
+        color: #f0a8cf;
+        font-size: .85rem;
+      }
+      .auth-divider {
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+        margin: 1.2rem 0;
+        color: var(--ink-soft);
+        font-size: .78rem;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+      }
+      .auth-divider::before, .auth-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      }
+      .auth-google {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .6rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="auth-shell">
+      <div class="card auth-card">
+        <div class="auth-brand">
+          <img class="auth-mascot" src="/images/avatar.png" alt="Renounce" />
+          <div>
+            <h2 style="margin-bottom:.2rem;">Renounce</h2>
+            <p class="muted" style="margin:0;">Make room for what matters.</p>
+          </div>
+        </div>
+
+        <div class="auth-toggle">
+          <button type="button" id="tab-login" class="active">Log in</button>
+          <button type="button" id="tab-signup">Sign up</button>
+        </div>
+
+        <p class="auth-error" id="auth-error"></p>
+
+        <form id="auth-form">
+          <div class="auth-field" id="name-field" style="display:none;">
+            <label for="name-input">Name</label>
+            <input type="text" id="name-input" placeholder="What should we call you?" />
+          </div>
+          <div class="auth-field">
+            <label for="email-input">Email</label>
+            <input type="email" id="email-input" placeholder="you@school.edu" required />
+          </div>
+          <div class="auth-field">
+            <label for="password-input">Password</label>
+            <input type="password" id="password-input" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;" id="submit-btn">Log in</button>
+        </form>
+
+        <div class="auth-divider">or</div>
+
+        <a href="/api/auth/google" class="btn btn-secondary auth-google">
+          Sign in with Google
+        </a>
+      </div>
+    </div>
+
+    <script>
+      const tabLogin = document.getElementById('tab-login');
+      const tabSignup = document.getElementById('tab-signup');
+      const nameField = document.getElementById('name-field');
+      const submitBtn = document.getElementById('submit-btn');
+      const form = document.getElementById('auth-form');
+      const errorEl = document.getElementById('auth-error');
+      let mode = 'login';
+
+      function setMode(next) {
+        mode = next;
+        tabLogin.classList.toggle('active', mode === 'login');
+        tabSignup.classList.toggle('active', mode === 'signup');
+        nameField.style.display = mode === 'signup' ? 'grid' : 'none';
+        submitBtn.textContent = mode === 'signup' ? 'Create account' : 'Log in';
+        errorEl.style.display = 'none';
+      }
+
+      tabLogin.addEventListener('click', () => setMode('login'));
+      tabSignup.addEventListener('click', () => setMode('signup'));
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        errorEl.style.display = 'none';
+
+        const email = document.getElementById('email-input').value.trim();
+        const password = document.getElementById('password-input').value.trim();
+        const name = document.getElementById('name-input').value.trim();
+
+        const endpoint = mode === 'signup' ? '/api/auth/signup' : '/api/auth/login';
+        const body = mode === 'signup' ? { email, password, name } : { email, password };
+
+        try {
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(body)
+          });
+          const data = await res.json();
+
+          if (!res.ok) {
+            errorEl.textContent = data.error || 'Something went wrong.';
+            errorEl.style.display = 'block';
+            return;
+          }
+
+          window.location.href = '/index.html';
+        } catch (err) {
+          errorEl.textContent = 'Could not reach the server. Try again.';
+          errorEl.style.display = 'block';
+        }
+      });
+
+      // Check for Google auth error redirect
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('error') === 'google') {
+        errorEl.textContent = 'Google sign-in failed. Try again or use email.';
+        errorEl.style.display = 'block';
+      }
+    </script>
+  </body>
+</html>
