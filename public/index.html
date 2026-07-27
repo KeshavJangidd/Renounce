@@ -4,23 +4,44 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Renounce Dashboard</title>
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
+    <link rel="shortcut icon" href="/favicon.ico?v=2" />
     <link rel="stylesheet" href="css/shared.css" />
   </head>
   <body>
     <main class="page-shell">
-      <section class="hero-card card">
-        <p class="eyebrow">Today’s focus</p>
-        <h1>Make room for what matters.</h1>
+      <section class="hero-card">
+        <span class="hero-badge">✦ Built for focused students</span>
+
+        <h1>
+          Make room
+          <span class="gradient-line">for what matters.</span>
+        </h1>
+
         <p class="hero-copy">
-          A calm system for turning your intentions into steady, meaningful progress—one session at a time.
+          A calm system for turning your intentions into steady, meaningful progress — one session at a time.
         </p>
+
         <div class="hero-actions">
-          <a class="btn btn-primary" href="timer.html">Start a session</a>
-          <a class="btn btn-secondary" href="deadlines.html">View deadlines</a>
+          <a class="btn btn-primary" href="timer.html">✦ Start a session →</a>
+          <a class="btn btn-secondary" href="deadlines.html">View deadlines →</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="stat-sessions">0</div>
+            <div class="hero-stat-label">Sessions logged</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="stat-streak">0</div>
+            <div class="hero-stat-label">Day streak</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="stat-deadlines">0</div>
+            <div class="hero-stat-label">Deadlines tracked</div>
+          </div>
         </div>
       </section>
 
@@ -153,6 +174,9 @@
           ]);
 
           document.getElementById('streak-count').textContent = `${getStreak(sessions)} days`;
+          document.getElementById('stat-sessions').textContent = sessions.length;
+          document.getElementById('stat-streak').textContent = getStreak(sessions);
+          document.getElementById('stat-deadlines').textContent = deadlines.length;
           renderSuggestedTask(deadlines);
           renderDeadlines(deadlines);
           renderMood(mood);
