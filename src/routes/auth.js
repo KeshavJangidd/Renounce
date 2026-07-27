@@ -7,6 +7,7 @@ const { loadStorage, saveStorage } = require('../lib/storage');
 
 const router = express.Router();
 const googleEnabled = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+const frontendUrl = process.env.FRONTEND_URL || 'https://renouncework.vercel.app';
 
 function normalizeUser(rawUser) {
   return {
@@ -173,9 +174,9 @@ router.get('/google', (req, res, next) => {
 
 router.get('/google/callback', (req, res, next) => {
   if (!googleEnabled) return res.status(503).json({ error: 'Google auth not configured' });
-  return passport.authenticate('google', { failureRedirect: '/auth.html?error=google' })(req, res, next);
+  return passport.authenticate('google', { failureRedirect: `${frontendUrl}/login.html?error=google` })(req, res, next);
 }, (req, res) => {
-  res.redirect('/');
+  res.redirect(`${frontendUrl}/`);
 });
 
 module.exports = router;

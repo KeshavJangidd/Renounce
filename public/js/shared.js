@@ -49,40 +49,41 @@
     </footer>
   `;
 
-  const root = document.body;
-  root.insertAdjacentHTML('afterbegin', headerMarkup);
-  root.insertAdjacentHTML('beforeend', footerMarkup);
-
   const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-  const navLinks = document.querySelectorAll('.nav-links a');
-  navLinks.forEach((link) => {
-    const href = link.getAttribute('href');
-    if (href === currentPath) {
-      link.classList.add('active');
-    }
-  });
-
-  const themeToggle = document.querySelector('.theme-toggle');
-
-  function updateThemeToggle(theme) {
-    const darkMode = theme === 'dark';
-    themeToggle.setAttribute('aria-label', `Switch to ${darkMode ? 'light' : 'dark'} mode`);
-    themeToggle.setAttribute('aria-pressed', String(darkMode));
-    themeToggle.querySelector('.theme-toggle-icon').textContent = darkMode ? '☀' : '☾';
-  }
-
-  updateThemeToggle(activeTheme);
-  themeToggle.addEventListener('click', () => {
-    const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = nextTheme;
-    localStorage.setItem(themeStorageKey, nextTheme);
-    updateThemeToggle(nextTheme);
-  });
-
-  // Auth check: redirect to login if not signed in (skip on the login page itself),
-  // and show the logged-in user's name in the nav pill
   const publicPages = ['login.html'];
+
   if (!publicPages.includes(currentPath)) {
+    const root = document.body;
+    root.insertAdjacentHTML('afterbegin', headerMarkup);
+    root.insertAdjacentHTML('beforeend', footerMarkup);
+
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach((link) => {
+      const href = link.getAttribute('href');
+      if (href === currentPath) {
+        link.classList.add('active');
+      }
+    });
+
+    const themeToggle = document.querySelector('.theme-toggle');
+
+    function updateThemeToggle(theme) {
+      const darkMode = theme === 'dark';
+      themeToggle.setAttribute('aria-label', `Switch to ${darkMode ? 'light' : 'dark'} mode`);
+      themeToggle.setAttribute('aria-pressed', String(darkMode));
+      themeToggle.querySelector('.theme-toggle-icon').textContent = darkMode ? '☀' : '☾';
+    }
+
+    updateThemeToggle(activeTheme);
+    themeToggle.addEventListener('click', () => {
+      const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = nextTheme;
+      localStorage.setItem(themeStorageKey, nextTheme);
+      updateThemeToggle(nextTheme);
+    });
+
+    // Auth check: redirect to login if not signed in (skip on the login page itself),
+    // and show the logged-in user's name in the nav pill
     window.apiFetch('/api/auth/me').then((res) => {
       if (!res.ok) {
         window.location.href = 'login.html';
