@@ -79,16 +79,23 @@
     updateThemeToggle(nextTheme);
   });
 
-  // Show logged-in user's name in the nav, linking to account.html
-  if (currentPath !== 'login.html') {
+  // Auth check: redirect to login if not signed in (skip on the login page itself),
+  // and show the logged-in user's name in the nav pill
+  const publicPages = ['login.html'];
+  if (!publicPages.includes(currentPath)) {
     window.apiFetch('/api/auth/me').then((res) => {
-      if (!res.ok) return;
+      if (!res.ok) {
+        window.location.href = 'login.html';
+        return null;
+      }
       return res.json();
     }).then((user) => {
       if (!user) return;
       const pill = document.getElementById('account-pill');
       pill.textContent = user.name || user.email;
       pill.style.display = 'inline-flex';
-    }).catch(() => {});
+    }).catch(() => {
+      window.location.href = 'login.html';
+    });
   }
 })();
