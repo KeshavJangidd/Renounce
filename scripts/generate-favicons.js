@@ -13,7 +13,7 @@ const Jimp = createJimp({
 });
 
 async function main() {
-  const source = path.join(process.cwd(), 'public', 'images', 'renounce-avatar.png');
+  const source = path.join(process.cwd(), 'favicon.png');
   const outputDir = path.join(process.cwd(), 'public');
 
   await fs.promises.mkdir(outputDir, { recursive: true });
@@ -26,10 +26,12 @@ async function main() {
   });
 
   const appleIconPath = path.join(outputDir, 'apple-touch-icon.png');
+  const faviconPngPath = path.join(outputDir, 'favicon.png');
   const icon32Path = path.join(outputDir, 'favicon-32x32.png');
   const icon16Path = path.join(outputDir, 'favicon-16x16.png');
   const faviconIcoPath = path.join(outputDir, 'favicon.ico');
 
+  await square.clone().resize({ w: 256, h: 256 }).write(faviconPngPath);
   await square.clone().resize({ w: 180, h: 180 }).write(appleIconPath);
   await square.clone().resize({ w: 32, h: 32 }).write(icon32Path);
   await square.clone().resize({ w: 16, h: 16 }).write(icon16Path);
