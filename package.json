@@ -10,7 +10,7 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "generate:favicons": "node scripts/generate-favicons.js",
-    "test": "node --check src/server.js && node --check src/routes/auth.js && node --check src/routes/api.js && node --check src/lib/storage.js && node --check public/js/shared.js && node --check public/js/workzone.js && node --check public/js/timer.js && node --check public/js/login.js && node --check public/js/deadlines.js && node --check public/js/achievements.js",
+    "test": "node --check src/server.js && node --check src/routes/auth.js && node --check src/routes/api.js && node --check src/lib/storage.js && node --check public/js/shared.js && node --check public/js/dashboard.js && node --check public/js/journal.js && node --check public/js/account.js && node --check public/js/workzone.js && node --check public/js/timer.js && node --check public/js/login.js && node --check public/js/deadlines.js && node --check public/js/achievements.js",
     "test:integration": "node test-integration.js"
   },
   "keywords": [],

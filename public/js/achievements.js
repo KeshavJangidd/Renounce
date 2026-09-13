@@ -1,16 +1,5 @@
 (function () {
-  const sessionsKey = 'renounce_sessions';
-  const deadlinesKey = 'renounce_deadlines';
   const container = document.getElementById('achievement-groups');
-
-  function readStorage(key) {
-    try {
-      return JSON.parse(localStorage.getItem(key) || '[]');
-    } catch (error) {
-      console.warn('Could not read localStorage', error);
-      return [];
-    }
-  }
 
   function groupByMonth(items) {
     return items.reduce((accumulator, item) => {
@@ -24,11 +13,23 @@
     }, {});
   }
 
-  function render() {
-    const sessions = readStorage(sessionsKey);
-    const deadlines = readStorage(deadlinesKey).filter((deadline) => deadline.isCompleted);
+  async function render() {
+    let sessions = [];
+    let deadlines = [];
+    try {
+      const [sessionsResponse, deadlinesResponse] = await Promise.all([
+        apiFetch('/api/sessions'),
+        apiFetch('/api/deadlines')
+      ]);
+      if (sessionsResponse.ok) sessions = await sessionsResponse.json();
+      if (deadlinesResponse.ok) deadlines = (await deadlinesResponse.json()).filter((deadline) => deadline.isCompleted);
+    } catch (error) {
+      container.innerHTML = '<div class="deadline-item">Could not load achievements. Please try again.</div>';
+      return;
+    }
+
     const combined = [
-      ...sessions.filter((session) => session.type === 'completed').map((session) => ({ ...session, kind: 'session' })),
+      ...sessions.filter((session) => session.completed).map((session) => ({ ...session, kind: 'session', completedAt: session.date })),
       ...deadlines.map((deadline) => ({ ...deadline, kind: 'deadline' }))
     ].sort((a, b) => new Date(b.completedAt || b.dueDate) - new Date(a.completedAt || a.dueDate));
 

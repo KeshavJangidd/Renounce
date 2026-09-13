@@ -70,6 +70,15 @@ async function runTests() {
     const jsTimerRes = await request('/js/timer.js');
     assert(jsTimerRes.status === 200 && jsTimerRes.text.includes('ProceduralAmbientSound') && jsTimerRes.text.includes('startBrownNoise') && jsTimerRes.text.includes('startRain') && jsTimerRes.text.includes('startForest') && jsTimerRes.text.includes('startCandle') && jsTimerRes.text.includes('updateDeskSceneUI') && jsTimerRes.text.includes('openParkingLot'), 'timer.js contains procedural sound generators (including candle ember), parking lot, and desk clock cozy scene logic');
 
+    const jsDashRes = await request('/js/dashboard.js');
+    assert(jsDashRes.status === 200 && jsDashRes.text.includes('renderRhythmMatrix') && jsDashRes.text.includes('fetchSessions'), 'dashboard.js delivers modular dashboard & rhythm matrix logic');
+
+    const jsJournalRes = await request('/js/journal.js');
+    assert(jsJournalRes.status === 200 && jsJournalRes.text.includes('applyReflection') && jsJournalRes.text.includes('journalParkingList'), 'journal.js delivers modular reflection & journal history logic');
+
+    const jsAccountRes = await request('/js/account.js');
+    assert(jsAccountRes.status === 200 && jsAccountRes.text.includes('populateUserData') && jsAccountRes.text.includes('profileForm'), 'account.js delivers modular account & preference sync logic');
+
     const imageRes = await request('/images/desk_clock_cozy.jpg');
     assert(imageRes.status === 200, 'Static image /images/desk_clock_cozy.jpg serves successfully');
 

@@ -4,7 +4,7 @@
   const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   const activeTheme = savedTheme || preferredTheme;
   document.documentElement.dataset.theme = activeTheme;
-  const isLocalhost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const isLocalhost = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
   const apiBaseUrl = window.RENOUNCE_API_URL || (isLocalhost
     ? (window.location.port === '3001' ? '' : 'http://localhost:3001')
     : 'https://renounce.onrender.com');

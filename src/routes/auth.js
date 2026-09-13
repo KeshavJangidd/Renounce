@@ -30,6 +30,8 @@ function normalizeUser(rawUser) {
     phone: userPhone,
     deadlines: Array.isArray(rawUser.deadlines) ? rawUser.deadlines : [],
     sessions: Array.isArray(rawUser.sessions) ? rawUser.sessions : [],
+    parkingLot: Array.isArray(rawUser.parkingLot) ? rawUser.parkingLot : [],
+    journal: rawUser.journal && typeof rawUser.journal === 'object' ? rawUser.journal : {},
     mood: rawUser.mood || null,
     goals: rawUser.goals || { longTerm: '', weekly: '', daily: '' },
     preferences: {
@@ -54,6 +56,8 @@ function createUserRecord({ email, passwordHash = null, googleId = null, name })
     phone: '',
     deadlines: [],
     sessions: [],
+    parkingLot: [],
+    journal: {},
     mood: null,
     goals: { longTerm: '', weekly: '', daily: '' },
     preferences: {}

@@ -622,13 +622,22 @@
   let parkedThoughts = [];
   let sessionParkedCount = 0;
 
-  function loadParkedThoughts() {
+  async function loadParkedThoughts() {
     try {
       parkedThoughts = JSON.parse(localStorage.getItem('renounce_parking_lot') || '[]');
     } catch (_) {
       parkedThoughts = [];
     }
     renderParkingList();
+
+    try {
+      const response = await apiFetch('/api/parking-lot');
+      if (response.ok) {
+        parkedThoughts = await response.json();
+        renderParkingList();
+        localStorage.setItem('renounce_parking_lot', JSON.stringify(parkedThoughts));
+      }
+    } catch (_) {}
   }
 
   function saveParkedThoughts() {
@@ -691,7 +700,7 @@
   }
 
   if (parkingForm) {
-    parkingForm.addEventListener('submit', (e) => {
+    parkingForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const thoughtText = parkingInput.value.trim();
       if (!thoughtText) return;
@@ -710,12 +719,19 @@
       parkingInput.value = '';
 
       try {
-        apiFetch('/api/parking-lot', {
+        const response = await apiFetch('/api/parking-lot', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ thought: newItem.thought, task: newItem.task })
-        }).catch(() => {});
-      } catch (_) {}
+        });
+        if (!response.ok) throw new Error('Parking lot sync failed');
+        const saved = await response.json();
+        parkedThoughts[0] = { ...newItem, ...saved, time: timeStr, date: saved.createdAt || newItem.date };
+        saveParkedThoughts();
+      } catch (_) {
+        if (parkingFeedback) parkingFeedback.textContent = 'Saved on this device; server sync failed.';
+        return;
+      }
 
       if (parkingFeedback) {
         parkingFeedback.textContent = '✓ Parked safely. Back to your calm focus.';
@@ -727,29 +743,36 @@
   }
 
   if (clearParkingBtn) {
-    clearParkingBtn.addEventListener('click', () => {
-      parkedThoughts = [];
-      saveParkedThoughts();
+    clearParkingBtn.addEventListener('click', async () => {
       try {
-        apiFetch('/api/parking-lot', { method: 'DELETE' }).catch(() => {});
-      } catch (_) {}
+        const response = await apiFetch('/api/parking-lot', { method: 'DELETE' });
+        if (!response.ok) throw new Error('Parking lot sync failed');
+        parkedThoughts = [];
+        saveParkedThoughts();
+      } catch (_) {
+        if (parkingFeedback) parkingFeedback.textContent = 'Could not clear saved thoughts.';
+      }
     });
   }
 
   if (parkingList) {
-    parkingList.addEventListener('click', (e) => {
+    parkingList.addEventListener('click', async (e) => {
       const btn = e.target.closest('[data-action="remove"]');
       if (!btn) return;
       const idx = parseInt(btn.getAttribute('data-idx'), 10);
       if (!isNaN(idx) && parkedThoughts[idx]) {
         const removedId = parkedThoughts[idx].id;
-        parkedThoughts.splice(idx, 1);
-        saveParkedThoughts();
         if (removedId) {
           try {
-            apiFetch(`/api/parking-lot/${removedId}`, { method: 'DELETE' }).catch(() => {});
-          } catch (_) {}
+            const response = await apiFetch(`/api/parking-lot/${removedId}`, { method: 'DELETE' });
+            if (!response.ok) throw new Error('Parking lot sync failed');
+          } catch (_) {
+            if (parkingFeedback) parkingFeedback.textContent = 'Could not remove saved thought.';
+            return;
+          }
         }
+        parkedThoughts.splice(idx, 1);
+        saveParkedThoughts();
       }
     });
   }

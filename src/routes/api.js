@@ -4,6 +4,10 @@ const { loadStorage, saveStorage } = require('../lib/storage');
 const router = express.Router();
 const EMPTY_GOALS = { longTerm: '', weekly: '', daily: '' };
 
+function validJournalDate(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
 function requireAuth(req, res, next) {
   if (!req.isAuthenticated()) return res.status(401).json({ error: 'Authentication required' });
   return next();
@@ -124,6 +128,32 @@ router.delete('/parking-lot', requireAuth, (req, res) => {
   user.parkingLot = [];
   saveStorage(data);
   return res.json({ ok: true });
+});
+
+router.get('/journal/:date', requireAuth, (req, res) => {
+  if (!validJournalDate(req.params.date)) return res.status(400).json({ error: 'Invalid journal date.' });
+  const data = loadStorage();
+  const user = getUser(data, req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  return res.json(user.journal?.[req.params.date] || null);
+});
+
+router.put('/journal/:date', requireAuth, (req, res) => {
+  if (!validJournalDate(req.params.date)) return res.status(400).json({ error: 'Invalid journal date.' });
+  const data = loadStorage();
+  const user = getUser(data, req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  user.journal = user.journal && typeof user.journal === 'object' ? user.journal : {};
+  const entry = {
+    date: req.params.date,
+    wins: String(req.body.wins || '').trim(),
+    challenges: String(req.body.challenges || '').trim(),
+    tomorrow: String(req.body.tomorrow || '').trim(),
+    updatedAt: new Date().toISOString()
+  };
+  user.journal[req.params.date] = entry;
+  saveStorage(data);
+  return res.json(entry);
 });
 
 router.get('/mood', requireAuth, (req, res) => {

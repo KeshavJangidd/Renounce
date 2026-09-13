@@ -25,12 +25,33 @@ if (isProduction) {
   app.set('trust proxy', 1);
 }
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrcAttr: ["'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https:", "http:"],
+      fontSrc: ["'self'", "https:", "http:", "data:"],
+      imgSrc: ["'self'", "data:", "https:", "http:"],
+      connectSrc: ["'self'", "http://localhost:*", "http://127.0.0.1:*", "https:"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      upgradeInsecureRequests: null
+    }
+  },
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   const origin = req.get('origin');
-  const isAllowedDevOrigin = !isProduction && origin && /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  const isAllowedDevOrigin = !isProduction && (
+    !origin ||
+    origin === 'null' ||
+    /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)
+  );
   if (origin && (allowedOrigins.has(origin) || isAllowedDevOrigin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
