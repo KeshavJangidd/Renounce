@@ -12,6 +12,43 @@
   </head>
   <body>
     <main class="page-shell">
+      <!-- Consolidated Goals: Today's Focus Direction -->
+      <section class="card" style="margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.85rem;">
+          <div>
+            <p class="eyebrow">Focus Direction</p>
+            <h2 style="margin: 0; font-size: 1.25rem;">What are you giving your energy to today?</h2>
+          </div>
+          <button type="button" class="btn btn-ghost" id="toggle-goals-btn" style="font-size: 0.8rem; padding: 0.25rem 0.65rem;">
+            <span id="toggle-goals-text">Show weekly & long-term goals ▾</span>
+          </button>
+        </div>
+
+        <div class="stack">
+          <label class="goal-field">
+            <span style="font-weight: 600; color: var(--ink);">Today's primary focus</span>
+            <div style="display: flex; gap: 0.65rem; align-items: center;">
+              <input id="goal-daily" type="text" placeholder="e.g. Complete one deep work block before dinner" />
+              <button type="button" class="btn btn-secondary" id="use-today-goal-btn" title="Copy goal to timer task" style="font-size: 0.82rem; white-space: nowrap;">
+                Use in timer ↓
+              </button>
+            </div>
+          </label>
+
+          <div id="expanded-goals" style="display: none; padding-top: 0.65rem; border-top: 1.5px solid var(--line-subtle);" class="stack">
+            <label class="goal-field">
+              <span>This week's goal</span>
+              <input id="goal-weekly" type="text" placeholder="e.g. Finish two focused review sessions" />
+            </label>
+            <label class="goal-field">
+              <span>Long-term goal</span>
+              <input id="goal-long-term" type="text" placeholder="e.g. Build a calm, sustainable study rhythm" />
+            </label>
+            <p id="goals-save-status" class="field-hint" style="min-height: 1.1rem; margin: 0;"></p>
+          </div>
+        </div>
+      </section>
+
       <section class="card timer-layout">
         <div class="timer-panel">
           <p class="eyebrow">Focus timer</p>
@@ -21,38 +58,190 @@
               Task
               <input id="task-input" name="task" type="text" placeholder="e.g. Review lecture notes" required />
             </label>
-            <label>
-              Duration
-              <select id="duration-select" name="duration">
-                <option value="15">15 min</option>
-                <option value="25" selected>25 min</option>
-                <option value="45">45 min</option>
-                <option value="60">60 min</option>
-              </select>
-            </label>
-            <div class="button-row">
-              <button class="btn btn-primary" type="submit">Start</button>
+            <fieldset class="timer-settings">
+              <legend>Focus duration</legend>
+              <div class="time-inputs">
+                <label>Hours <input id="duration-hours" type="number" min="0" value="0" inputmode="numeric" /></label>
+                <label>Minutes <input id="duration-minutes" type="number" min="0" max="59" value="25" inputmode="numeric" /></label>
+              </div>
+            </fieldset>
+            <fieldset class="timer-settings">
+              <legend>Break plan <span class="field-hint">Optional</span></legend>
+              <div class="time-inputs">
+                <label>Break every (min) <input id="break-every" type="number" min="0" value="0" inputmode="numeric" /></label>
+                <label>Break length (min) <input id="break-length" type="number" min="0" value="5" inputmode="numeric" /></label>
+              </div>
+              <span class="field-hint">Set “Break every” to 0 for no automatic breaks. You can still start a break whenever you need one.</span>
+            </fieldset>
+
+            <!-- The Pledge: Consciously Renouncing Distractions -->
+            <div class="pledge-card">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.3rem;">
+                <span class="eyebrow" style="margin: 0;">The Pledge</span>
+                <span class="field-hint" style="font-size: 0.76rem;">Consciously renounce 1 distraction</span>
+              </div>
+              <div class="pledge-pill-row" id="pledge-pill-row">
+                <button type="button" class="pledge-pill active" data-pledge="Phone">📱 Phone</button>
+                <button type="button" class="pledge-pill" data-pledge="Social Media">🌐 Social Media</button>
+                <button type="button" class="pledge-pill" data-pledge="Tab Switching">🔀 Tab Switching</button>
+                <button type="button" class="pledge-pill" data-pledge="Multitasking">☕ Multitasking</button>
+                <button type="button" class="pledge-pill" data-pledge="custom" id="custom-pledge-btn">✏️ Custom...</button>
+              </div>
+              <input type="text" id="custom-pledge-input" placeholder="What are you renouncing this session?" style="display: none; margin-top: 0.5rem; font-size: 0.82rem;" />
+            </div>
+
+            <!-- Built-in Generative Ambient Sounds (Offline Web Audio API) -->
+            <div class="ambient-dock">
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="font-size: 0.78rem; font-weight: 600; color: var(--ink);">Ambient:</span>
+                <div class="ambient-pill-group" id="ambient-sound-group">
+                  <button type="button" class="ambient-pill active" data-sound="off">Off</button>
+                  <button type="button" class="ambient-pill" data-sound="rain" title="Synthesized rain on canvas tent">🌧️ Rain</button>
+                  <button type="button" class="ambient-pill" data-sound="brown" title="Soft brown noise for deep focus and reading">☕ Brown Noise</button>
+                  <button type="button" class="ambient-pill" data-sound="forest" title="Synthesized forest breeze and babbling stream">🍃 Forest Wind</button>
+                  <button type="button" class="ambient-pill" data-sound="candle" title="Warm candle glow & soft fireplace crackle">🕯️ Candle Ember</button>
+                </div>
+              </div>
+              <div class="ambient-volume-wrap">
+                <span id="ambient-vol-icon">🔉</span>
+                <input type="range" class="ambient-slider" id="ambient-volume" min="0" max="1" step="0.05" value="0.5" title="Ambient Sound Volume" />
+              </div>
+            </div>
+
+            <div class="button-row" style="margin-top: 0.5rem;">
+              <button class="btn btn-primary" type="submit" id="start-main-btn">Start</button>
               <button class="btn btn-secondary" type="button" id="pause-btn">Pause</button>
+              <button class="btn btn-secondary" type="button" id="break-btn">Take break</button>
               <button class="btn btn-ghost" type="button" id="abandon-btn">Abandon</button>
             </div>
           </form>
-          <div class="session-log">
-            <p id="status-text">Choose a task and start your timer.</p>
-            <p id="session-count">Sessions logged: 0</p>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; padding-top: 0.85rem; border-top: 1.5px solid var(--line-subtle);">
+            <div class="session-log" style="margin: 0;">
+              <p id="status-text" style="margin: 0 0 0.2rem;">Choose a task and start your timer.</p>
+              <p id="session-count" style="margin: 0;">Sessions logged: 0</p>
+            </div>
+
+            <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary" id="open-parking-btn" title="Distraction Parking Lot (Brain dump thoughts - Press P)" style="font-size: 0.78rem; padding: 0.3rem 0.65rem;">
+                <span>💭 Park (P)</span><span class="parking-badge" id="parking-badge" style="display: none;">0</span>
+              </button>
+              <button type="button" class="btn btn-ghost" id="sound-toggle-btn" title="Toggle singing bowl chime on session complete" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;">
+                <span id="sound-toggle-icon">🔔</span> <span id="sound-toggle-label">Chime On</span>
+              </button>
+              <button type="button" class="btn btn-secondary" id="enter-desk-clock-btn" title="Ambient Desk Clock / Idle Screen Mode (Press D)" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;">
+                <span>Desk Clock (D) 🕰️</span>
+              </button>
+              <button type="button" class="btn btn-secondary" id="enter-zen-btn" title="Enter Zen Fullscreen Mode (Press F)" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;">
+                <span>Zen (F) ⛶</span>
+              </button>
+            </div>
           </div>
         </div>
 
         <div class="timer-visual">
-          <svg class="progress-ring" viewBox="0 0 120 120" aria-label="Timer progress ring">
-            <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
-            <circle class="ring-progress" id="ring-progress" cx="60" cy="60" r="52"></circle>
-          </svg>
-          <div class="tree-stage">
-            <div id="tree" class="tree"></div>
+          <p class="zen-task-title" id="zen-task-label">A calm study block</p>
+          <div class="timer-ring-container">
+            <svg class="progress-ring" viewBox="0 0 120 120" aria-label="Timer progress ring">
+              <circle class="ring-bg" cx="60" cy="60" r="52"></circle>
+              <circle class="ring-progress" id="ring-progress" cx="60" cy="60" r="52"></circle>
+            </svg>
+            <div class="tree-stage">
+              <div id="tree" class="seedling-box">
+                <svg viewBox="0 0 100 100" class="seedling-svg" aria-hidden="true">
+                  <path d="M50 85 Q50 60 50 42 Q50 25 50 18" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" fill="none" />
+                  <path d="M50 42 C30 35 25 50 50 54" fill="currentColor" opacity="0.92" />
+                  <path d="M50 30 C70 20 75 38 50 40" fill="currentColor" />
+                  <circle cx="50" cy="18" r="4.5" fill="currentColor" />
+                </svg>
+              </div>
+            </div>
           </div>
           <p id="time-display" class="time-display">25:00</p>
+          <div class="pledge-anchor" id="pledge-anchor" style="display: inline-flex;">
+            <span>🛡️</span> <span>Renouncing: <strong id="pledge-anchor-text">Phone</strong></span>
+          </div>
         </div>
       </section>
+
+      <!-- Zen Mode Bottom Floating Controls -->
+      <div class="zen-exit-banner" id="zen-exit-banner">
+        <span style="font-size: 0.82rem; font-weight: 600; color: var(--accent);">🌱 Zen Focus</span>
+        <button type="button" class="btn btn-secondary" id="zen-pause-btn" style="height: 30px; padding: 0 0.85rem; font-size: 0.78rem;">Pause</button>
+        <button type="button" class="btn btn-secondary" id="zen-park-btn" style="height: 30px; padding: 0 0.85rem; font-size: 0.78rem;">💭 Park (P)</button>
+        <button type="button" class="btn btn-ghost" id="exit-zen-btn" style="height: 30px; padding: 0 0.85rem; font-size: 0.78rem;">Exit Zen (Esc)</button>
+      </div>
+
+      <!-- Distraction Parking Lot (Brain Dump Modal) -->
+      <div class="parking-lot-backdrop" id="parking-lot-backdrop">
+        <div class="parking-lot-modal" role="dialog" aria-modal="true" aria-labelledby="parking-lot-title">
+          <div class="parking-lot-header">
+            <div>
+              <span class="eyebrow" style="margin: 0;">Distraction Parking Lot</span>
+              <h2 id="parking-lot-title" style="margin: 0.2rem 0 0; font-size: 1.15rem;">Park it for later.</h2>
+            </div>
+            <button type="button" class="btn btn-ghost" id="close-parking-btn" style="font-size: 1.2rem; padding: 0.1rem 0.5rem; line-height: 1;">✕</button>
+          </div>
+          <p class="field-hint" style="margin: 0 0 0.65rem;">
+            Don't let a random impulse break your flow. Type the thought, press Enter, and get right back to work.
+          </p>
+          <form id="parking-form" class="parking-input-row">
+            <input type="text" id="parking-input" placeholder="e.g. Check price of that book, reply to Alex..." autocomplete="off" />
+            <button type="submit" class="btn btn-primary" style="white-space: nowrap; font-size: 0.85rem;">Park (↵)</button>
+          </form>
+          <div id="parking-feedback" class="parking-feedback"></div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <span style="font-size: 0.78rem; font-weight: 600; color: var(--ink);">Parked Thoughts</span>
+            <button type="button" class="btn btn-ghost" id="clear-parking-btn" style="font-size: 0.74rem; padding: 0.1rem 0.4rem; color: var(--ink-faint);">Clear all</button>
+          </div>
+          <div class="parking-list" id="parking-list">
+            <!-- Parked items populated dynamically -->
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; border-top: 1.5px solid var(--line-subtle); padding-top: 0.75rem;">
+            <a href="journal.html" class="btn btn-ghost" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;">Review in Daily Journal →</a>
+            <button type="button" class="btn btn-primary" id="return-focus-btn" style="font-size: 0.78rem; padding: 0.3rem 0.75rem;">Return to Focus</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ambient Desk Clock / Idle Screen Mode Overlay -->
+      <div class="desk-clock-overlay" id="desk-clock-overlay">
+        <div class="desk-clock-scene-backdrop" id="desk-clock-scene-backdrop"></div>
+        <div class="desk-clock-content" style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <div class="desk-clock-seedling-stage animate-breathe">
+            <div id="desk-clock-tree" class="seedling-box">
+              <svg viewBox="0 0 100 100" class="seedling-svg" aria-hidden="true" style="width: 76px; height: 76px;">
+                <path d="M50 85 Q50 60 50 42 Q50 25 50 18" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" fill="none" />
+                <path d="M50 42 C30 35 25 50 50 54" fill="currentColor" opacity="0.92" />
+                <path d="M50 30 C70 20 75 38 50 40" fill="currentColor" />
+                <circle cx="50" cy="18" r="4.5" fill="currentColor" />
+              </svg>
+            </div>
+          </div>
+          <p class="desk-clock-task" id="desk-clock-task">A calm study block</p>
+          <div class="pledge-anchor" id="desk-clock-pledge-anchor" style="margin-bottom: 0.75rem;">
+            <span>🛡️</span> <span>Renouncing: <strong id="desk-clock-pledge-text">Phone</strong></span>
+          </div>
+          <div class="desk-clock-time" id="desk-clock-time">25:00</div>
+          <div class="desk-clock-subtext">Minutes : Seconds</div>
+          <div class="desk-clock-realtime" id="desk-clock-realtime">12:00 PM</div>
+        </div>
+
+        <div class="desk-clock-bar">
+          <button type="button" class="btn btn-secondary" id="desk-clock-pause-btn" style="height: 32px; font-size: 0.78rem;">Pause</button>
+          <button type="button" class="btn btn-secondary" id="desk-clock-park-btn" style="height: 32px; font-size: 0.78rem;">💭 Park (P)</button>
+          <button type="button" class="btn btn-secondary" id="desk-clock-scene-btn" style="height: 32px; font-size: 0.78rem;" title="Toggle Cozy Night Study Desk Atmosphere">
+            <span id="desk-clock-scene-label">🖼️ Cozy Scene</span>
+          </button>
+          <button type="button" class="btn btn-ghost" id="desk-clock-dim-btn" style="height: 32px; font-size: 0.78rem;" title="Cycle lighting / dimmer mode">
+            <span id="desk-clock-dim-label">🌙 Night Dim</span>
+          </button>
+          <button type="button" class="btn btn-ghost" id="desk-clock-time-toggle-btn" style="height: 32px; font-size: 0.78rem;" title="Toggle between Timer and Real-world Clock">
+            ⏱️ Toggle Time
+          </button>
+          <button type="button" class="btn btn-ghost" id="exit-desk-clock-btn" style="height: 32px; font-size: 0.78rem;">Exit (Esc)</button>
+        </div>
+      </div>
     </main>
 
     <script src="js/shared.js"></script>

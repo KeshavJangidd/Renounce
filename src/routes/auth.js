@@ -10,17 +10,35 @@ const googleEnabled = Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE
 const frontendUrl = process.env.FRONTEND_URL || 'https://renouncework.vercel.app';
 
 function normalizeUser(rawUser) {
+  if (!rawUser) return null;
+  const rawPreferences = rawUser.preferences || {};
+  const userAge = rawUser.age !== undefined && rawUser.age !== null
+    ? Number(rawUser.age)
+    : (rawPreferences.age !== undefined && rawPreferences.age !== null ? Number(rawPreferences.age) : null);
+  const userPurpose = rawUser.purpose || rawPreferences.purpose || '';
+  const userPhone = rawUser.phone || rawPreferences.phone || '';
+  const userName = rawUser.name || rawPreferences.name || 'Renounce User';
+
   return {
     id: rawUser.id,
     email: rawUser.email?.toLowerCase() || '',
     passwordHash: rawUser.passwordHash || null,
     googleId: rawUser.googleId || null,
-    name: rawUser.name || 'Renounce User',
+    name: userName,
+    age: userAge,
+    purpose: userPurpose,
+    phone: userPhone,
     deadlines: Array.isArray(rawUser.deadlines) ? rawUser.deadlines : [],
     sessions: Array.isArray(rawUser.sessions) ? rawUser.sessions : [],
     mood: rawUser.mood || null,
     goals: rawUser.goals || { longTerm: '', weekly: '', daily: '' },
-    preferences: rawUser.preferences || {}
+    preferences: {
+      ...rawPreferences,
+      name: userName,
+      age: userAge,
+      purpose: userPurpose,
+      phone: userPhone
+    }
   };
 }
 
@@ -30,7 +48,10 @@ function createUserRecord({ email, passwordHash = null, googleId = null, name })
     email,
     passwordHash,
     googleId,
-    name,
+    name: name || 'Renounce User',
+    age: null,
+    purpose: '',
+    phone: '',
     deadlines: [],
     sessions: [],
     mood: null,
@@ -47,17 +68,20 @@ function sanitizeUser(user) {
 
 function findUserByEmail(email) {
   const data = loadStorage();
-  return data.users.find((user) => user.email === email.toLowerCase()) || null;
+  const raw = data.users.find((user) => user.email === email.toLowerCase());
+  return raw ? normalizeUser(raw) : null;
 }
 
 function findUserById(id) {
   const data = loadStorage();
-  return data.users.find((user) => user.id === id) || null;
+  const raw = data.users.find((user) => user.id === id);
+  return raw ? normalizeUser(raw) : null;
 }
 
 function findUserByGoogleId(googleId) {
   const data = loadStorage();
-  return data.users.find((user) => user.googleId === googleId) || null;
+  const raw = data.users.find((user) => user.googleId === googleId);
+  return raw ? normalizeUser(raw) : null;
 }
 
 passport.serializeUser((user, done) => done(null, user.id));
@@ -107,7 +131,10 @@ if (googleEnabled) {
 
 router.get('/me', (req, res) => {
   if (!req.isAuthenticated()) return res.status(401).json({ error: 'Not authenticated' });
-  return res.json(sanitizeUser(req.user));
+  const data = loadStorage();
+  const user = data.users.find((entry) => entry.id === req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  return res.json(sanitizeUser(normalizeUser(user)));
 });
 
 router.patch('/me', (req, res) => {
@@ -117,15 +144,62 @@ router.patch('/me', (req, res) => {
   const user = data.users.find((entry) => entry.id === req.user.id);
   if (!user) return res.status(404).json({ error: 'Not found' });
 
-  if (req.body.name !== undefined) {
-    user.name = req.body.name.trim() || user.name;
+  if (!user.preferences) {
+    user.preferences = {};
   }
-  if (req.body.preferences) {
+
+  // Name
+  if (req.body.name !== undefined) {
+    const trimmed = String(req.body.name).trim();
+    if (trimmed) {
+      user.name = trimmed;
+      user.preferences.name = trimmed;
+    }
+  }
+
+  // Age
+  if (req.body.age !== undefined) {
+    const parsedAge = parseInt(req.body.age, 10);
+    user.age = isNaN(parsedAge) ? null : parsedAge;
+    user.preferences.age = user.age;
+  }
+
+  // Purpose
+  if (req.body.purpose !== undefined) {
+    user.purpose = String(req.body.purpose).trim();
+    user.preferences.purpose = user.purpose;
+  }
+
+  // Phone
+  if (req.body.phone !== undefined) {
+    user.phone = String(req.body.phone).trim();
+    user.preferences.phone = user.phone;
+  }
+
+  // Nested preferences
+  if (req.body.preferences && typeof req.body.preferences === 'object') {
     user.preferences = { ...user.preferences, ...req.body.preferences };
+    if (user.preferences.name && !req.body.name) {
+      user.name = String(user.preferences.name).trim() || user.name;
+    }
+    if (user.preferences.age !== undefined && req.body.age === undefined) {
+      const pAge = parseInt(user.preferences.age, 10);
+      user.age = isNaN(pAge) ? null : pAge;
+    }
+    if (user.preferences.purpose !== undefined && req.body.purpose === undefined) {
+      user.purpose = String(user.preferences.purpose).trim();
+    }
+    if (user.preferences.phone !== undefined && req.body.phone === undefined) {
+      user.phone = String(user.preferences.phone).trim();
+    }
   }
 
   saveStorage(data);
-  return res.json(sanitizeUser(user));
+  const normalized = normalizeUser(user);
+  if (req.user) {
+    Object.assign(req.user, normalized);
+  }
+  return res.json(sanitizeUser(normalized));
 });
 
 router.post('/signup', async (req, res, next) => {

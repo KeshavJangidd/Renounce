@@ -13,18 +13,16 @@
   <body>
     <main class="page-shell">
       <section class="hero-card">
-        <span class="hero-badge">✦ Built for focused students</span>
+        <span class="hero-badge">Built for calm focus</span>
 
-        <h1> 
-          <span class="gradient-line">Embrace Progress</span>
-        </h1>
+        <h1>Embrace Progress</h1>
 
         <p class="hero-copy">
           A calm system for turning your intentions into steady, meaningful progress — one session at a time.
         </p>
 
         <div class="hero-actions">
-          <a class="btn btn-primary" href="timer.html">✦ Start a session →</a>
+          <a class="btn btn-primary" href="timer.html">Start a session →</a>
           <a class="btn btn-secondary" href="deadlines.html">View deadlines →</a>
         </div>
 
@@ -58,9 +56,24 @@
         </article>
 
         <article class="card stat-card">
-          <p class="eyebrow">Consistency</p>
-          <h2 id="streak-count">0 days</h2>
-          <p>Keep the rhythm alive by showing up for one intentional moment each day.</p>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <p class="eyebrow" style="margin: 0;">Consistency</p>
+            <span class="badge-subtle" id="consistency-badge">Quiet Momentum</span>
+          </div>
+          <h2 id="streak-count" style="margin: 0.5rem 0 0.25rem;">0 days streak</h2>
+          <p id="rhythm-summary" class="muted" style="margin: 0 0 0.75rem; font-size: 0.85rem;">
+            Showing up for one intentional session builds lasting rhythm.
+          </p>
+          <div class="rhythm-matrix" id="rhythm-matrix" aria-label="Last 28 days study activity"></div>
+          <div class="rhythm-legend">
+            <span>28-day study rhythm</span>
+            <div class="rhythm-legend-dots" title="Activity level: None to High">
+              <span class="rhythm-legend-dot" style="background: var(--surface-subtle); border: 1px solid var(--line-subtle);"></span>
+              <span class="rhythm-legend-dot" style="background: #d4e5d8;"></span>
+              <span class="rhythm-legend-dot" style="background: #87b593;"></span>
+              <span class="rhythm-legend-dot" style="background: #335340;"></span>
+            </div>
+          </div>
         </article>
 
         <article class="card stat-card mood-card">
@@ -72,6 +85,24 @@
             <button class="mood-btn" data-mood="overwhelmed">Overwhelmed</button>
           </div>
           <p id="mood-status">Tap a feeling to save your current energy.</p>
+        </article>
+
+        <!-- Ambient Desk Mode Feature Showcase -->
+        <article class="card stat-card" style="grid-column: span 12; display: flex; flex-direction: row; flex-wrap: wrap; gap: 1.5rem; align-items: center; padding: 1.35rem;">
+          <div style="flex: 1; min-width: 280px;">
+            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.4rem;">
+              <p class="eyebrow" style="margin: 0;">Physical Study Companion</p>
+              <span class="badge-subtle">Aesthetic Idle Mode</span>
+            </div>
+            <h2 style="margin: 0 0 0.5rem; font-size: 1.3rem;">Study with physical books & notebooks.</h2>
+            <p class="muted" style="margin: 0 0 1.1rem; font-size: 0.88rem; line-height: 1.55;">
+              Prop your laptop or tablet on your desk beside your textbooks and notebook. Press <strong>D</strong> on the timer to enter ambient Desk Clock mode with large tabular numerals, warm candle glow lighting, and procedural rain or brown noise.
+            </p>
+            <a href="timer.html" class="btn btn-secondary" style="font-size: 0.82rem;">Launch Focus Space (D) →</a>
+          </div>
+          <div style="width: 100%; max-width: 380px; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--line); aspect-ratio: 16/9; box-shadow: var(--shadow);">
+            <img src="/images/desk_clock_cozy.jpg" alt="Cozy night study desk with physical textbooks and iPad in ambient desk clock mode" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />
+          </div>
         </article>
       </section>
     </main>
@@ -162,7 +193,55 @@
           const status = document.getElementById('mood-status');
           if (mood && mood.value) {
             status.textContent = `Saved mood: ${mood.value.charAt(0).toUpperCase() + mood.value.slice(1)}.`;
+            document.querySelectorAll('.mood-btn').forEach((btn) => {
+              btn.classList.toggle('active', btn.getAttribute('data-mood') === mood.value);
+            });
           }
+        }
+
+        function renderRhythmMatrix(sessions) {
+          const matrixEl = document.getElementById('rhythm-matrix');
+          const summaryEl = document.getElementById('rhythm-summary');
+          if (!matrixEl) return;
+
+          const dateMinutes = {};
+          sessions.forEach((s) => {
+            if (s.date) {
+              const d = s.date.slice(0, 10);
+              dateMinutes[d] = (dateMinutes[d] || 0) + (Number(s.minutes) || 0);
+            }
+          });
+
+          const now = new Date();
+          const days = [];
+          let activeDaysCount = 0;
+
+          // Generate last 28 days (4 weeks)
+          for (let i = 27; i >= 0; i -= 1) {
+            const d = new Date(now);
+            d.setDate(now.getDate() - i);
+            const dateKey = d.toISOString().slice(0, 10);
+            const mins = dateMinutes[dateKey] || 0;
+            if (mins > 0) activeDaysCount += 1;
+
+            let level = 0;
+            if (mins >= 60) level = 3;
+            else if (mins >= 25) level = 2;
+            else if (mins > 0) level = 1;
+
+            const dateLabel = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+            days.push({ mins, level, dateLabel });
+          }
+
+          if (summaryEl) {
+            summaryEl.textContent = activeDaysCount > 0
+              ? `${activeDaysCount} of the last 28 days had focused study blocks.`
+              : 'Showing up for one intentional session builds lasting rhythm.';
+          }
+
+          matrixEl.innerHTML = days.map((day) => `
+            <div class="rhythm-cell" data-level="${day.level}" title="${day.dateLabel}: ${day.mins ? day.mins + ' min focused' : 'No sessions'}"></div>
+          `).join('');
         }
 
         async function init() {
@@ -172,19 +251,22 @@
             fetchMood()
           ]);
 
-          document.getElementById('streak-count').textContent = `${getStreak(sessions)} days`;
+          document.getElementById('streak-count').textContent = `${getStreak(sessions)} days streak`;
           document.getElementById('stat-sessions').textContent = sessions.length;
           document.getElementById('stat-streak').textContent = getStreak(sessions);
           document.getElementById('stat-deadlines').textContent = deadlines.length;
           renderSuggestedTask(deadlines);
           renderDeadlines(deadlines);
           renderMood(mood);
+          renderRhythmMatrix(sessions);
 
           document.querySelectorAll('.mood-btn').forEach((button) => {
             button.addEventListener('click', async () => {
-              const mood = button.getAttribute('data-mood');
-              await saveMood(mood);
-              document.getElementById('mood-status').textContent = `Saved mood: ${mood.charAt(0).toUpperCase() + mood.slice(1)}.`;
+              const moodVal = button.getAttribute('data-mood');
+              await saveMood(moodVal);
+              document.querySelectorAll('.mood-btn').forEach((btn) => btn.classList.remove('active'));
+              button.classList.add('active');
+              document.getElementById('mood-status').textContent = `Saved mood: ${moodVal.charAt(0).toUpperCase() + moodVal.slice(1)}.`;
             });
           });
         }

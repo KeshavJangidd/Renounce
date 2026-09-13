@@ -30,7 +30,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use((req, res, next) => {
   const origin = req.get('origin');
-  if (origin && allowedOrigins.has(origin)) {
+  const isAllowedDevOrigin = !isProduction && origin && /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  if (origin && (allowedOrigins.has(origin) || isAllowedDevOrigin)) {
     res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
@@ -73,6 +74,12 @@ app.use((err, req, res, next) => {
   return res.status(500).send('Internal server error');
 });
 
-app.listen(PORT, () => {
-  console.log(`Renounce backend running on http://localhost:${PORT}`);
-});
+let serverInstance = null;
+if (!process.env.TEST_MODE) {
+  serverInstance = app.listen(PORT, () => {
+    console.log(`Renounce backend running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
+module.exports.server = serverInstance;

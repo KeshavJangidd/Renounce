@@ -71,18 +71,59 @@ router.get('/sessions', requireAuth, (req, res) => {
 router.post('/sessions', requireAuth, (req, res) => {
   const data = loadStorage();
   const user = getUser(data, req.user.id);
-  const { task, minutes, completed } = req.body;
+  const { task, minutes, completed, pledge, parkedThoughts } = req.body;
   if (!task || !minutes) return res.status(400).json({ error: 'Task and minutes are required.' });
   const session = {
     id: `session-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     task: task.trim(),
     minutes: Number(minutes),
     completed: Boolean(completed),
+    pledge: pledge ? String(pledge).trim() : null,
+    parkedThoughts: Array.isArray(parkedThoughts) ? parkedThoughts : [],
     date: new Date().toISOString()
   };
   user.sessions.push(session);
   saveStorage(data);
   return res.status(201).json(session);
+});
+
+router.get('/parking-lot', requireAuth, (req, res) => {
+  const data = loadStorage();
+  const user = getUser(data, req.user.id);
+  return res.json(user.parkingLot || []);
+});
+
+router.post('/parking-lot', requireAuth, (req, res) => {
+  const data = loadStorage();
+  const user = getUser(data, req.user.id);
+  const { thought, task } = req.body;
+  if (!thought) return res.status(400).json({ error: 'Thought content is required.' });
+  user.parkingLot = user.parkingLot || [];
+  const item = {
+    id: `thought-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    thought: thought.trim(),
+    task: task ? task.trim() : '',
+    createdAt: new Date().toISOString()
+  };
+  user.parkingLot.unshift(item);
+  saveStorage(data);
+  return res.status(201).json(item);
+});
+
+router.delete('/parking-lot/:id', requireAuth, (req, res) => {
+  const data = loadStorage();
+  const user = getUser(data, req.user.id);
+  user.parkingLot = (user.parkingLot || []).filter((item) => item.id !== req.params.id);
+  saveStorage(data);
+  return res.json({ ok: true });
+});
+
+router.delete('/parking-lot', requireAuth, (req, res) => {
+  const data = loadStorage();
+  const user = getUser(data, req.user.id);
+  user.parkingLot = [];
+  saveStorage(data);
+  return res.json({ ok: true });
 });
 
 router.get('/mood', requireAuth, (req, res) => {

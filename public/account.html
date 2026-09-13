@@ -12,78 +12,509 @@
   </head>
   <body>
     <main class="page-shell">
-      <section class="hero-card card" style="min-height:auto;">
-        <p class="eyebrow">Your account</p>
-        <h1 id="account-name">Renounce User</h1>
-        <p class="hero-copy" id="account-email">—</p>
+      <!-- Account Overview Header Card -->
+      <section class="card" style="margin-bottom: 1.25rem;">
+        <p class="eyebrow">Your Account</p>
+        <h1 id="account-name" style="margin-bottom: 0.25rem;">Renounce User</h1>
+        <p class="muted" id="account-email" style="margin: 0;">—</p>
       </section>
 
-      <section class="dashboard-grid">
-        <article class="card stat-card inner-card" style="grid-column: span 6;">
-          <p class="eyebrow">Profile</p>
-          <div class="stack">
-            <label>Name
-              <input type="text" id="name-input" />
-            </label>
-            <label>Preferred session length (minutes)
-              <select id="default-duration">
-                <option value="15">15</option>
-                <option value="25" selected>25</option>
-                <option value="45">45</option>
-                <option value="60">60</option>
-              </select>
-            </label>
-            <button class="btn btn-primary" id="save-btn">Save changes</button>
-            <p id="save-status" class="muted"></p>
+      <!-- Minimalist Navigation Tabs -->
+      <nav class="account-tabs" aria-label="Account sections">
+        <button type="button" class="tab-btn active" id="tab-profile-btn">Profile & Focus</button>
+        <button type="button" class="tab-btn" id="tab-personal-btn">Personal Details</button>
+      </nav>
+
+      <!-- Panel 1: Profile & Focus -->
+      <div id="view-profile" class="view-panel">
+        <section class="dashboard-grid">
+          <!-- Main Profile Form -->
+          <article class="card stat-card" style="grid-column: span 7; min-height: auto;">
+            <p class="eyebrow">Profile & Focus</p>
+            <h2 style="margin-bottom: 1.25rem;">Study Profile</h2>
+
+            <form id="profile-form" class="stack">
+              <!-- Name -->
+              <label>
+                Full Name
+                <input type="text" id="name-input" placeholder="Your full name" />
+              </label>
+
+              <!-- Age -->
+              <label>
+                Age
+                <input type="number" id="age-input" min="10" max="120" placeholder="e.g. 21" />
+                <span class="field-hint">Helps tailor suggested work rhythms and intensity.</span>
+              </label>
+
+              <!-- Purpose of using Renounce (with improved language) -->
+              <label>
+                Core Focus Intention
+                <select id="purpose-select">
+                  <option value="" disabled selected>Select your primary focus intention...</option>
+                  <option value="Deep work & distraction-free study">Deep work & distraction-free study</option>
+                  <option value="Exam & coursework preparation">Exam & coursework preparation</option>
+                  <option value="Building a sustainable daily routine">Building a sustainable daily routine</option>
+                  <option value="Balancing projects and academic deadlines">Balancing projects and academic deadlines</option>
+                  <option value="Overcoming procrastination & burnout">Overcoming procrastination & burnout</option>
+                  <option value="__custom__">Custom focus intention...</option>
+                </select>
+                <span class="field-hint">What you primarily want Renounce to help you achieve.</span>
+              </label>
+
+              <!-- Custom purpose text field (shown when custom is selected) -->
+              <div id="purpose-custom-wrapper" style="display: none;">
+                <label>
+                  Describe your personal focus intention
+                  <input type="text" id="purpose-custom-input" placeholder="e.g. Preparing for medical school entrance exams" />
+                </label>
+              </div>
+
+              <!-- Preferred Session Duration -->
+              <fieldset class="timer-settings">
+                <legend>Preferred session length</legend>
+                <div class="time-inputs">
+                  <label>Hours <input id="default-duration-hours" type="number" min="0" value="0" inputmode="numeric" /></label>
+                  <label>Minutes <input id="default-duration-minutes" type="number" min="0" max="59" value="25" inputmode="numeric" /></label>
+                </div>
+                <span class="field-hint">Sets a flexible default duration for your timers.</span>
+              </fieldset>
+
+              <div style="margin-top: 0.5rem;">
+                <button class="btn btn-primary" type="submit" id="save-btn">Save changes</button>
+              </div>
+              <p id="save-status" class="muted" style="margin: 0; min-height: 1.2rem;"></p>
+            </form>
+          </article>
+
+          <!-- Side Cards -->
+          <div style="grid-column: span 5; display: grid; gap: 1rem; align-content: start;">
+            <!-- Personal Details Teaser Card -->
+            <article class="card stat-card inner-card" style="min-height: auto;">
+              <p class="eyebrow">Privacy & Security</p>
+              <h3>Personal Details</h3>
+              <p class="muted">View your verified email, contact mobile number, and authentication methods.</p>
+              <div style="margin-top: 0.75rem;">
+                <button type="button" class="btn btn-secondary" id="open-personal-btn">View personal details →</button>
+              </div>
+            </article>
+
+            <!-- Session Card -->
+            <article class="card stat-card inner-card" style="min-height: auto;">
+              <p class="eyebrow">Session</p>
+              <h3>Account Status</h3>
+              <p class="muted">Signed in with <span id="account-provider">email</span>.</p>
+              <div style="margin-top: 0.75rem;">
+                <button type="button" class="btn btn-ghost" id="logout-btn">Log out</button>
+              </div>
+            </article>
           </div>
-        </article>
+        </section>
+      </div>
 
-        <article class="card stat-card inner-card" style="grid-column: span 6;">
-          <p class="eyebrow">Session</p>
-          <p class="muted">Signed in with <span id="account-provider">email</span>.</p>
-          <button class="btn btn-secondary" id="logout-btn">Log out</button>
-        </article>
-      </section>
+      <!-- Panel 2: Personal Details (Shown only after clicking) -->
+      <div id="view-personal" class="view-panel" hidden>
+        <section class="card" style="max-width: 640px; margin: 0 auto;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem;">
+            <div>
+              <p class="eyebrow">Confidential Details</p>
+              <h2 style="margin: 0 0 0.25rem;">Personal Details</h2>
+              <p class="muted" style="margin: 0;">Private contact credentials associated with your Renounce account.</p>
+            </div>
+            <button type="button" class="btn btn-ghost" id="back-to-profile-btn" style="font-size: 0.82rem;">← Back</button>
+          </div>
+
+          <form id="personal-form" class="stack">
+            <!-- Email -->
+            <label>
+              Email Address
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="email" id="personal-email" readonly style="background: var(--surface-subtle); cursor: not-allowed; opacity: 0.85;" />
+              </div>
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.25rem;">
+                <span class="badge-subtle">Primary authentication email</span>
+              </div>
+            </label>
+
+            <!-- Mobile Number -->
+            <label>
+              Mobile Number
+              <input type="tel" id="phone-input" placeholder="e.g. +1 (555) 019-2834" />
+              <span class="field-hint">Your mobile number is optional and used for study alerts or verification if configured.</span>
+            </label>
+
+            <!-- Provider info -->
+            <div class="inner-card" style="padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
+              <p style="margin: 0; font-size: 0.82rem; color: var(--ink-soft);">
+                Account Sign-in Provider: <strong id="personal-provider-badge" style="color: var(--ink);">Email & Password</strong>
+              </p>
+            </div>
+
+            <div style="margin-top: 0.5rem; display: flex; gap: 0.75rem; align-items: center;">
+              <button class="btn btn-primary" type="submit" id="save-personal-btn">Save contact details</button>
+              <button type="button" class="btn btn-secondary" id="back-btn-secondary">Back to Profile</button>
+            </div>
+            <p id="personal-save-status" class="muted" style="margin: 0; min-height: 1.2rem;"></p>
+          </form>
+
+          <hr style="margin: 1.5rem 0 1.25rem;" />
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <p class="muted" style="margin: 0; font-size: 0.82rem;">Need to switch accounts?</p>
+            <button type="button" class="btn btn-ghost" id="logout-btn-personal">Log out</button>
+          </div>
+        </section>
+      </div>
     </main>
 
     <script src="js/shared.js"></script>
     <script>
-      (async function () {
+      (function () {
+        // Elements
+        const accountName = document.getElementById('account-name');
+        const accountEmail = document.getElementById('account-email');
+        const accountProvider = document.getElementById('account-provider');
+        const personalEmail = document.getElementById('personal-email');
+        const personalProviderBadge = document.getElementById('personal-provider-badge');
+
         const nameInput = document.getElementById('name-input');
-        const durationSelect = document.getElementById('default-duration');
+        const ageInput = document.getElementById('age-input');
+        const purposeSelect = document.getElementById('purpose-select');
+        const purposeCustomWrapper = document.getElementById('purpose-custom-wrapper');
+        const purposeCustomInput = document.getElementById('purpose-custom-input');
+        const durationHours = document.getElementById('default-duration-hours');
+        const durationMinutes = document.getElementById('default-duration-minutes');
+        const phoneInput = document.getElementById('phone-input');
+
+        const profileForm = document.getElementById('profile-form');
+        const personalForm = document.getElementById('personal-form');
         const saveStatus = document.getElementById('save-status');
+        const personalSaveStatus = document.getElementById('personal-save-status');
 
-        const res = await apiFetch('/api/auth/me');
-        if (!res.ok) {
-          window.location.href = '/login.html';
-          return;
+        // Tabs & Views
+        const tabProfileBtn = document.getElementById('tab-profile-btn');
+        const tabPersonalBtn = document.getElementById('tab-personal-btn');
+        const viewProfile = document.getElementById('view-profile');
+        const viewPersonal = document.getElementById('view-personal');
+        const openPersonalBtn = document.getElementById('open-personal-btn');
+        const backToProfileBtn = document.getElementById('back-to-profile-btn');
+        const backBtnSecondary = document.getElementById('back-btn-secondary');
+
+        const standardPurposes = [
+          'Deep work & distraction-free study',
+          'Exam & coursework preparation',
+          'Building a sustainable daily routine',
+          'Balancing projects and academic deadlines',
+          'Overcoming procrastination & burnout'
+        ];
+
+        function showView(view) {
+          if (view === 'personal') {
+            viewProfile.hidden = true;
+            viewPersonal.hidden = false;
+            tabProfileBtn.classList.remove('active');
+            tabPersonalBtn.classList.add('active');
+            window.location.hash = 'personal';
+          } else {
+            viewPersonal.hidden = true;
+            viewProfile.hidden = false;
+            tabPersonalBtn.classList.remove('active');
+            tabProfileBtn.classList.add('active');
+            if (window.location.hash === '#personal') {
+              history.replaceState(null, '', window.location.pathname);
+            }
+          }
         }
-        const user = await res.json();
 
-        document.getElementById('account-name').textContent = user.name || 'Renounce User';
-        document.getElementById('account-email').textContent = user.email || '';
-        document.getElementById('account-provider').textContent = user.googleId ? 'Google' : 'email';
-        nameInput.value = user.name || '';
-        if (user.preferences?.defaultDuration) {
-          durationSelect.value = user.preferences.defaultDuration;
+        tabProfileBtn.addEventListener('click', () => showView('profile'));
+        tabPersonalBtn.addEventListener('click', () => showView('personal'));
+        openPersonalBtn.addEventListener('click', () => showView('personal'));
+        backToProfileBtn.addEventListener('click', () => showView('profile'));
+        backBtnSecondary.addEventListener('click', () => showView('profile'));
+
+        // Handle purpose selection change
+        purposeSelect.addEventListener('change', () => {
+          if (purposeSelect.value === '__custom__') {
+            purposeCustomWrapper.style.display = 'block';
+            purposeCustomInput.focus();
+          } else {
+            purposeCustomWrapper.style.display = 'none';
+          }
+        });
+
+        // 1. Live update header and nav pill as user types their name
+        nameInput.addEventListener('input', () => {
+          const typed = nameInput.value.trim();
+          accountName.textContent = typed || 'Renounce User';
+          const pill = document.getElementById('account-pill');
+          if (pill && typed) {
+            pill.textContent = typed;
+            pill.style.display = 'inline-flex';
+          }
+        });
+
+        // 2. Synchronous initialization from localStorage to eliminate "Renounce User" flash
+        try {
+          const cached = JSON.parse(localStorage.getItem('renounce_profile') || '{}');
+          if (cached.name) {
+            accountName.textContent = cached.name;
+            nameInput.value = cached.name;
+            const pill = document.getElementById('account-pill');
+            if (pill) {
+              pill.textContent = cached.name;
+              pill.style.display = 'inline-flex';
+            }
+          }
+          if (cached.email) {
+            accountEmail.textContent = cached.email;
+            personalEmail.value = cached.email;
+          }
+          if (cached.age !== undefined && cached.age !== null && cached.age !== '') {
+            ageInput.value = cached.age;
+          }
+          if (cached.purpose) {
+            if (standardPurposes.includes(cached.purpose)) {
+              purposeSelect.value = cached.purpose;
+            } else {
+              purposeSelect.value = '__custom__';
+              purposeCustomWrapper.style.display = 'block';
+              purposeCustomInput.value = cached.purpose;
+            }
+          }
+          if (cached.phone) {
+            phoneInput.value = cached.phone;
+          }
+          if (cached.defaultDuration) {
+            const defaultMinutes = Number(cached.defaultDuration);
+            durationHours.value = Math.floor(defaultMinutes / 60);
+            durationMinutes.value = defaultMinutes % 60;
+          }
+        } catch (_) {}
+
+        function populateUserData(user) {
+          if (!user) return;
+          const displayName = user.name || nameInput.value.trim() || 'Renounce User';
+          accountName.textContent = displayName;
+          if (user.email) {
+            accountEmail.textContent = user.email;
+            personalEmail.value = user.email;
+          }
+
+          const provider = user.googleId ? 'Google' : 'email';
+          accountProvider.textContent = provider;
+          personalProviderBadge.textContent = user.googleId ? 'Google Account' : 'Email & Password';
+
+          if (user.name) {
+            nameInput.value = user.name;
+          }
+          const userAge = user.age !== null && user.age !== undefined
+            ? user.age
+            : (user.preferences?.age !== undefined && user.preferences?.age !== null ? user.preferences.age : null);
+          if (userAge !== null && userAge !== undefined && userAge !== '') {
+            ageInput.value = userAge;
+          }
+          const userPhone = user.phone || user.preferences?.phone || '';
+          if (userPhone) {
+            phoneInput.value = userPhone;
+          }
+
+          // Purpose
+          const userPurpose = user.purpose || user.preferences?.purpose || '';
+          if (standardPurposes.includes(userPurpose)) {
+            purposeSelect.value = userPurpose;
+            purposeCustomWrapper.style.display = 'none';
+            purposeCustomInput.value = '';
+          } else if (userPurpose) {
+            purposeSelect.value = '__custom__';
+            purposeCustomWrapper.style.display = 'block';
+            purposeCustomInput.value = userPurpose;
+          }
+
+          if (user.preferences?.defaultDuration) {
+            const defaultMinutes = Number(user.preferences.defaultDuration);
+            durationHours.value = Math.floor(defaultMinutes / 60);
+            durationMinutes.value = defaultMinutes % 60;
+          }
+
+          // Sync into localStorage
+          try {
+            const existing = JSON.parse(localStorage.getItem('renounce_profile') || '{}');
+            localStorage.setItem('renounce_profile', JSON.stringify({
+              ...existing,
+              name: user.name || existing.name,
+              email: user.email || existing.email,
+              age: userAge ?? existing.age,
+              purpose: userPurpose || existing.purpose,
+              phone: userPhone || existing.phone,
+              defaultDuration: user.preferences?.defaultDuration ?? existing.defaultDuration
+            }));
+          } catch (_) {}
+
+          // Also update nav account-pill
+          const pill = document.getElementById('account-pill');
+          if (pill) {
+            pill.textContent = user.name || user.email || displayName;
+            pill.style.display = 'inline-flex';
+          }
         }
 
-        document.getElementById('save-btn').addEventListener('click', async () => {
-          const res = await apiFetch('/api/auth/me', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+        // Check hash for initial tab
+        if (window.location.hash === '#personal') {
+          showView('personal');
+        }
+
+        // Save Profile Form
+        profileForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+
+          const currentName = nameInput.value.trim() || 'Renounce User';
+          // Immediately update header where "Renounce User" is displayed
+          accountName.textContent = currentName;
+          const pill = document.getElementById('account-pill');
+          if (pill && nameInput.value.trim()) {
+            pill.textContent = nameInput.value.trim();
+            pill.style.display = 'inline-flex';
+          }
+
+          saveStatus.textContent = 'Saving...';
+
+          let selectedPurpose = purposeSelect.value;
+          if (selectedPurpose === '__custom__') {
+            selectedPurpose = purposeCustomInput.value.trim();
+          }
+
+          const parsedAge = ageInput.value.trim() !== '' ? Number(ageInput.value) : null;
+          const durationTotal = Number(durationHours.value || 0) * 60 + Number(durationMinutes.value || 0);
+
+          // Save immediately to localStorage
+          try {
+            const existing = JSON.parse(localStorage.getItem('renounce_profile') || '{}');
+            localStorage.setItem('renounce_profile', JSON.stringify({
+              ...existing,
               name: nameInput.value.trim(),
-              preferences: { defaultDuration: durationSelect.value }
-            })
-          });
-          saveStatus.textContent = res.ok ? 'Saved.' : 'Could not save changes.';
+              age: parsedAge,
+              purpose: selectedPurpose,
+              defaultDuration: durationTotal
+            }));
+          } catch (_) {}
+
+          const payload = {
+            name: nameInput.value.trim(),
+            age: parsedAge,
+            purpose: selectedPurpose,
+            preferences: {
+              name: nameInput.value.trim(),
+              age: parsedAge,
+              purpose: selectedPurpose,
+              defaultDuration: durationTotal
+            }
+          };
+
+          try {
+            const res = await apiFetch('/api/auth/me', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+              const updated = await res.json();
+              populateUserData(updated);
+              saveStatus.textContent = 'Changes saved successfully.';
+              setTimeout(() => {
+                if (saveStatus.textContent === 'Changes saved successfully.') {
+                  saveStatus.textContent = '';
+                }
+              }, 3500);
+            } else {
+              if (res.status === 401) {
+                saveStatus.innerHTML = '<span style="color: var(--ink);">Saved locally. Session expired — <a href="login.html" style="text-decoration: underline; font-weight: 600;">log in to sync with server →</a></span>';
+              } else {
+                const errData = await res.json().catch(() => ({}));
+                saveStatus.textContent = errData.error || `Saved locally. (Server status: ${res.status})`;
+              }
+            }
+          } catch (err) {
+            saveStatus.textContent = 'Saved locally. (Server offline or restarting)';
+          }
         });
 
-        document.getElementById('logout-btn').addEventListener('click', async () => {
-          await apiFetch('/api/auth/logout', { method: 'POST' });
-          window.location.href = '/login.html';
+        // Save Personal Form (Mobile number)
+        personalForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          personalSaveStatus.textContent = 'Saving...';
+
+          const phoneVal = phoneInput.value.trim();
+
+          // Save immediately to localStorage
+          try {
+            const existing = JSON.parse(localStorage.getItem('renounce_profile') || '{}');
+            existing.phone = phoneVal;
+            localStorage.setItem('renounce_profile', JSON.stringify(existing));
+          } catch (_) {}
+
+          const payload = {
+            phone: phoneVal,
+            preferences: {
+              phone: phoneVal
+            }
+          };
+
+          try {
+            const res = await apiFetch('/api/auth/me', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+              const updated = await res.json();
+              populateUserData(updated);
+              personalSaveStatus.textContent = 'Personal details saved.';
+              setTimeout(() => {
+                if (personalSaveStatus.textContent === 'Personal details saved.') {
+                  personalSaveStatus.textContent = '';
+                }
+              }, 3500);
+            } else {
+              if (res.status === 401) {
+                personalSaveStatus.innerHTML = '<span style="color: var(--ink);">Saved locally. Session expired — <a href="login.html" style="text-decoration: underline; font-weight: 600;">log in to sync with server →</a></span>';
+              } else {
+                const errData = await res.json().catch(() => ({}));
+                personalSaveStatus.textContent = errData.error || `Saved locally. (Server status: ${res.status})`;
+              }
+            }
+          } catch (err) {
+            personalSaveStatus.textContent = 'Saved locally. (Server offline or restarting)';
+          }
         });
+
+        // Log out handlers
+        async function handleLogout() {
+          try {
+            await apiFetch('/api/auth/logout', { method: 'POST' });
+          } catch (_) {}
+          localStorage.removeItem('renounce_profile');
+          window.location.href = '/login.html';
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', handleLogout);
+        document.getElementById('logout-btn-personal').addEventListener('click', handleLogout);
+
+        // Fetch User Info in background to synchronize with server
+        (async function fetchCurrentUser() {
+          try {
+            const res = await apiFetch('/api/auth/me');
+            if (res.ok) {
+              const user = await res.json();
+              populateUserData(user);
+            } else if (res.status === 401) {
+              saveStatus.innerHTML = 'Not signed in. <a href="login.html" style="color: var(--ink); text-decoration: underline; font-weight: 600;">Sign in to sync your profile →</a>';
+            }
+          } catch (err) {
+            // Offline or local preview
+          }
+        })();
       })();
     </script>
   </body>

@@ -1,41 +1,14 @@
 {
   "users": [
     {
-      "id": "user-1785049205258-srw4hw",
-      "email": "legacy@renounce.local",
-      "passwordHash": null,
-      "googleId": null,
-      "name": "Legacy User",
-      "deadlines": [],
-      "sessions": [],
-      "mood": null,
-      "goals": {
-        "longTerm": "",
-        "weekly": "",
-        "daily": "Ship the first draft"
-      }
-    },
-    {
-      "id": "user-1785049205317-pfhh1l",
-      "email": "demo@renounce.local",
-      "passwordHash": "$2b$10$O.YPFa5Irjy7q4P7IKCtLOiXLP5l.hXnI0bLV/g9xPt8ped4SPzZi",
-      "googleId": null,
-      "name": "Demo User",
-      "deadlines": [],
-      "sessions": [],
-      "mood": null,
-      "goals": {
-        "longTerm": "",
-        "weekly": "",
-        "daily": ""
-      }
-    },
-    {
       "id": "user-1785142170834-3kc2kf",
       "email": "keshavjangid2800@gmail.com",
       "passwordHash": "$2b$10$/N.zjfR0/5PVGFLu93DyEe5xUM5xbK.TU8ofoJrA8M8XtOfoucSeC",
       "googleId": null,
       "name": "Keshav Jangid",
+      "age": null,
+      "purpose": "",
+      "phone": "",
       "deadlines": [],
       "sessions": [],
       "mood": null,
@@ -44,6 +17,54 @@
         "weekly": "",
         "daily": ""
       }
+    },
+    {
+      "id": "user-1789209333561-2io43k",
+      "email": "keshavjangiddd@gmail.com",
+      "passwordHash": "$2b$12$B1BBbukMrpm57gv5Pf0DgeNWH1Pwong4FE7xGB4WuX2W.2Bo.HU72",
+      "googleId": null,
+      "name": "Keshav Jangid",
+      "age": null,
+      "purpose": "",
+      "phone": "",
+      "deadlines": [],
+      "sessions": [
+        {
+          "id": "session-1789217296217-3a3s",
+          "task": "Pomodoro session",
+          "minutes": 25,
+          "completed": true,
+          "date": "2026-09-12T12:48:16.218Z"
+        },
+        {
+          "id": "session-1789218075810-tdw9",
+          "task": "Custom",
+          "minutes": 265,
+          "completed": false,
+          "date": "2026-09-12T13:01:15.811Z"
+        },
+        {
+          "id": "session-1789218087267-lg1v",
+          "task": "Custom",
+          "minutes": 265,
+          "completed": false,
+          "date": "2026-09-12T13:01:27.267Z"
+        },
+        {
+          "id": "session-1789218090926-4w45",
+          "task": "Custom",
+          "minutes": 265,
+          "completed": false,
+          "date": "2026-09-12T13:01:30.926Z"
+        }
+      ],
+      "mood": null,
+      "goals": {
+        "longTerm": "",
+        "weekly": "",
+        "daily": ""
+      },
+      "preferences": {}
     }
   ]
 }

@@ -24,15 +24,12 @@
       <div class="header-actions">
         <nav class="nav-links" aria-label="Primary navigation">
           <a href="index.html">Dashboard</a>
-          <a href="timer.html">Timer</a>
+          <a href="timer.html">Focus Timer</a>
           <a href="deadlines.html">Deadlines</a>
+          <a href="journal.html">Daily Journal</a>
           <a href="achievements.html">Achievements</a>
-          <a href="resume.html">Resume</a>
-          <a href="workzone.html">Work Zone</a>
-          <a href="talk.html">Talk to Kavir</a>
-          <a href="account.html">Account</a>
         </nav>
-        <span class="account-pill" id="account-pill" style="display:none;"></span>
+        <a class="account-pill" id="account-pill" href="account.html" style="display:none;" aria-label="Open account details"></a>
         <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
           <span class="theme-toggle-icon" aria-hidden="true">☾</span>
         </button>
@@ -82,6 +79,22 @@
       updateThemeToggle(nextTheme);
     });
 
+    // Instant local cache population for account pill
+    try {
+      const cached = JSON.parse(localStorage.getItem('renounce_profile') || '{}');
+      if (cached.name || cached.email) {
+        const pill = document.getElementById('account-pill');
+        if (pill) {
+          pill.textContent = cached.name || cached.email;
+          pill.style.display = 'inline-flex';
+          if (currentPath === 'account.html') {
+            pill.classList.add('active');
+            pill.setAttribute('aria-current', 'page');
+          }
+        }
+      }
+    } catch (_) {}
+
     // Auth check: redirect to login if not signed in (skip on the login page itself),
     // and show the logged-in user's name in the nav pill
     window.apiFetch('/api/auth/me').then((res) => {
@@ -95,6 +108,21 @@
       const pill = document.getElementById('account-pill');
       pill.textContent = user.name || user.email;
       pill.style.display = 'inline-flex';
+      if (currentPath === 'account.html') {
+        pill.classList.add('active');
+        pill.setAttribute('aria-current', 'page');
+      }
+      try {
+        const existing = JSON.parse(localStorage.getItem('renounce_profile') || '{}');
+        localStorage.setItem('renounce_profile', JSON.stringify({
+          ...existing,
+          name: user.name,
+          email: user.email,
+          age: user.age,
+          purpose: user.purpose,
+          phone: user.phone
+        }));
+      } catch (_) {}
     }).catch(() => {
       window.location.href = 'login.html';
     });

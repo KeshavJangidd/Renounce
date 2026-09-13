@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renounce — Daily Journal</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=3" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=3" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
+    <link rel="shortcut icon" href="/favicon.ico?v=3" />
+    <link rel="stylesheet" href="css/shared.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <!-- Header Banner -->
+      <section class="card" style="margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <p class="eyebrow">Daily Focus Journal</p>
+            <h1 style="margin: 0 0 0.4rem;">Your quiet record of intentional work.</h1>
+            <p class="muted" style="margin: 0;">A peaceful timeline of completed sessions, mindful reflections, and steady momentum.</p>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <a class="btn btn-primary" href="timer.html">Start new session →</a>
+          </div>
+        </div>
+
+        <!-- Daily Metrics Ribbon -->
+        <div class="hero-stats" style="max-width: 100%; margin-top: 1.25rem;">
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="journal-today-minutes">0m</div>
+            <div class="hero-stat-label">Focus time today</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="journal-today-sessions">0</div>
+            <div class="hero-stat-label">Sessions finished today</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-value" id="journal-total-hours">0h</div>
+            <div class="hero-stat-label">Lifetime focus hours</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Grid: Daily Reflection & Session Timeline -->
+      <section class="dashboard-grid">
+        <!-- Daily Reflection Card -->
+        <article class="card stat-card" style="grid-column: span 6; min-height: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <p class="eyebrow" style="margin: 0;">Daily Reflection</p>
+            <span class="badge-subtle" id="journal-date-badge">Today</span>
+          </div>
+          <h2 style="margin-bottom: 0.5rem;">Mindful Reflection</h2>
+          <p class="muted" style="margin-bottom: 1.25rem; font-size: 0.88rem;">
+            Take sixty seconds to clear your mind after studying. Write down what you achieved and what you're leaving behind.
+          </p>
+
+          <form id="journal-form" class="stack">
+            <label>
+              <span>What went well during today's study blocks?</span>
+              <textarea id="reflection-wins" rows="3" placeholder="e.g. Cleared 2 chapters of physiology without checking my phone once."></textarea>
+            </label>
+
+            <label>
+              <span>What distracted you or felt challenging?</span>
+              <textarea id="reflection-challenges" rows="3" placeholder="e.g. Felt a slump around 3 PM; need to step away for fresh air next time."></textarea>
+            </label>
+
+            <label>
+              <span>Tomorrow's primary intention</span>
+              <input type="text" id="reflection-tomorrow" placeholder="e.g. Protect a morning 50-minute block for problem sets." />
+            </label>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+              <button class="btn btn-primary" type="submit" id="save-journal-btn">Save reflection</button>
+              <p id="journal-save-status" class="muted" style="margin: 0; font-size: 0.82rem;"></p>
+            </div>
+          </form>
+
+          <!-- Today's Distraction Parking Lot Review -->
+          <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1.5px solid var(--line-subtle);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <div>
+                <p class="eyebrow" style="margin: 0;">Impulses Resisted</p>
+                <h3 style="margin: 0.15rem 0 0; font-size: 1rem;">Parked Thoughts from Today</h3>
+              </div>
+              <span class="badge-subtle" id="parked-journal-badge">0 parked</span>
+            </div>
+            <p class="muted" style="font-size: 0.82rem; margin: 0 0 0.75rem;">
+              Thoughts you captured in the Parking Lot instead of breaking your study flow.
+            </p>
+            <div id="journal-parking-list" class="list-card-stack" style="max-height: 180px; overflow-y: auto;">
+              <!-- Dynamically populated from localStorage & api -->
+            </div>
+          </div>
+        </article>
+
+        <!-- Session History Timeline -->
+        <article class="card stat-card" style="grid-column: span 6; min-height: auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <p class="eyebrow" style="margin: 0;">Session Timeline</p>
+            <span class="muted" id="timeline-count" style="font-size: 0.82rem;">0 sessions</span>
+          </div>
+          <h2 style="margin-bottom: 0.5rem;">Completed Focus Blocks</h2>
+          <p class="muted" style="margin-bottom: 1.25rem; font-size: 0.88rem;">
+            Every logged session is proof of your commitment to undistracted work.
+          </p>
+
+          <div id="session-timeline" class="list-card-stack">
+            <div class="inner-card" style="padding: 1.5rem; text-align: center;">
+              <p class="muted" style="margin: 0;">Loading your study history...</p>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <script src="js/shared.js"></script>
+    <script>
+      (async function () {
+        const todayMinutesEl = document.getElementById('journal-today-minutes');
+        const todaySessionsEl = document.getElementById('journal-today-sessions');
+        const totalHoursEl = document.getElementById('journal-total-hours');
+        const timelineCountEl = document.getElementById('timeline-count');
+        const sessionTimelineEl = document.getElementById('session-timeline');
+        const dateBadge = document.getElementById('journal-date-badge');
+
+        const winsInput = document.getElementById('reflection-wins');
+        const challengesInput = document.getElementById('reflection-challenges');
+        const tomorrowInput = document.getElementById('reflection-tomorrow');
+        const journalForm = document.getElementById('journal-form');
+        const journalSaveStatus = document.getElementById('journal-save-status');
+
+        const now = new Date();
+        const todayKey = `renounce_journal_${now.toISOString().slice(0, 10)}`;
+        dateBadge.textContent = now.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+
+        // Load today's reflection from localStorage
+        try {
+          const cached = JSON.parse(localStorage.getItem(todayKey) || '{}');
+          if (cached.wins) winsInput.value = cached.wins;
+          if (cached.challenges) challengesInput.value = cached.challenges;
+          if (cached.tomorrow) tomorrowInput.value = cached.tomorrow;
+        } catch (_) {}
+
+        // Save reflection handler
+        journalForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const reflection = {
+            date: now.toISOString(),
+            wins: winsInput.value.trim(),
+            challenges: challengesInput.value.trim(),
+            tomorrow: tomorrowInput.value.trim()
+          };
+          localStorage.setItem(todayKey, JSON.stringify(reflection));
+          journalSaveStatus.textContent = 'Reflection saved.';
+          setTimeout(() => {
+            if (journalSaveStatus.textContent === 'Reflection saved.') {
+              journalSaveStatus.textContent = '';
+            }
+          }, 3000);
+        });
+
+        // Fetch Sessions
+        try {
+          const res = await apiFetch('/api/sessions');
+          if (!res.ok) {
+            sessionTimelineEl.innerHTML = '<p class="muted" style="padding: 1rem;">Sign in to view session history.</p>';
+            return;
+          }
+          const sessions = await res.json();
+          timelineCountEl.textContent = `${sessions.length} total`;
+
+          const todayStr = now.toISOString().slice(0, 10);
+          let todayMins = 0;
+          let todayCount = 0;
+          let totalMins = 0;
+
+          sessions.forEach((s) => {
+            const mins = Number(s.minutes) || 0;
+            totalMins += mins;
+            const sDate = (s.date || '').slice(0, 10);
+            if (sDate === todayStr && s.completed) {
+              todayMins += mins;
+              todayCount += 1;
+            }
+          });
+
+          todayMinutesEl.textContent = `${todayMins}m`;
+          todaySessionsEl.textContent = todayCount;
+          totalHoursEl.textContent = `${(totalMins / 60).toFixed(1)}h`;
+
+          if (!sessions.length) {
+            sessionTimelineEl.innerHTML = `
+              <div class="inner-card" style="padding: 2rem; text-align: center;">
+                <p style="margin: 0 0 0.5rem; font-size: 1rem; color: var(--ink);">No sessions logged yet.</p>
+                <p class="muted" style="margin: 0 0 1rem; font-size: 0.85rem;">Start your first deep work block to watch your tree grow and log your progress.</p>
+                <a href="timer.html" class="btn btn-secondary">Open Focus Timer →</a>
+              </div>
+            `;
+            return;
+          }
+
+          // Sort descending (most recent first)
+          const sorted = [...sessions].reverse();
+          sessionTimelineEl.innerHTML = sorted.map((s) => {
+            const mins = Number(s.minutes) || 0;
+            const dateObj = new Date(s.date || Date.now());
+            const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const dateFmt = dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            const isCompleted = s.completed !== false;
+
+            return `
+              <div class="deadline-item" style="border-radius: var(--radius-sm);">
+                <div>
+                  <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span style="font-size: 1rem;">${isCompleted ? '🌱' : '⏸'}</span>
+                    <strong style="font-size: 0.92rem; color: var(--ink);">${escapeHtml(s.task || 'Focus block')}</strong>
+                  </div>
+                  <p class="muted" style="margin: 0.25rem 0 0 1.5rem; font-size: 0.78rem;">
+                    ${dateFmt} at ${timeStr} · ${mins} minutes
+                    ${s.pledge ? ` · <span style="color: var(--accent); font-weight: 500;">🛡️ Renounced: ${escapeHtml(s.pledge)}</span>` : ''}
+                  </p>
+                </div>
+                <span class="badge-subtle" style="${isCompleted ? 'color: var(--accent);' : ''}">
+                  ${isCompleted ? 'Completed' : 'Interrupted'}
+                </span>
+              </div>
+            `;
+          }).join('');
+
+        } catch (err) {
+          sessionTimelineEl.innerHTML = '<p class="muted" style="padding: 1rem;">Could not load sessions.</p>';
+        }
+
+        // Render Today's Parked Thoughts
+        const journalParkingList = document.getElementById('journal-parking-list');
+        const parkedBadge = document.getElementById('parked-journal-badge');
+        let parkedThoughts = [];
+        try {
+          parkedThoughts = JSON.parse(localStorage.getItem('renounce_parking_lot') || '[]');
+        } catch (_) {
+          parkedThoughts = [];
+        }
+
+        if (parkedBadge) {
+          parkedBadge.textContent = `${parkedThoughts.length} parked`;
+        }
+
+        if (journalParkingList) {
+          if (!parkedThoughts.length) {
+            journalParkingList.innerHTML = `
+              <div class="inner-card" style="padding: 1.1rem; text-align: center;">
+                <p class="muted" style="margin: 0; font-size: 0.82rem;">No impulses parked today. Full mental presence maintained.</p>
+              </div>
+            `;
+          } else {
+            journalParkingList.innerHTML = parkedThoughts.map((item) => `
+              <div class="deadline-item" style="padding: 0.55rem 0.75rem; border-radius: var(--radius-sm);">
+                <div>
+                  <div style="font-size: 0.88rem; color: var(--ink);">${escapeHtml(item.thought)}</div>
+                  <p class="muted" style="margin: 0.15rem 0 0; font-size: 0.74rem;">
+                    ${item.time || 'Today'} · During: ${escapeHtml(item.task || 'Focus block')}
+                  </p>
+                </div>
+                <span class="badge-subtle" style="font-size: 0.7rem; color: var(--ink-faint);">Resisted ✓</span>
+              </div>
+            `).join('');
+          }
+        }
+
+        function escapeHtml(str) {
+          return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+        }
+      })();
+    </script>
+  </body>
+</html>
+
