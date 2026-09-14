@@ -12,98 +12,196 @@
   </head>
   <body>
     <main class="page-shell">
-      <section class="hero-card">
-        <span class="hero-badge">Built for calm focus</span>
+      <section class="hero-recall">
+        <h1 class="hero-headline">
+          <span>Renounce noise.</span>
+          <span class="hero-glow">Embrace progress.</span>
+        </h1>
 
-        <h1>Embrace Progress</h1>
-
-        <p class="hero-copy">
-          A calm system for turning your intentions into steady, meaningful progress — one session at a time.
+        <p class="hero-description">
+          The noise of the day moves fast. Your intentions shouldn't disappear with it. Renounce shields your deep focus, parks distractions automatically, and turns steady momentum into quiet mastery.
         </p>
 
         <div class="hero-actions">
-          <a class="btn btn-primary" href="timer.html">Start a session →</a>
-          <a class="btn btn-secondary" href="deadlines.html">View deadlines →</a>
+          <a class="btn-pill-primary" href="timer.html">Start focusing for free →</a>
+          <a class="btn-pill-secondary" href="deadlines.html">View deadlines</a>
         </div>
 
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <div class="hero-stat-value" id="stat-sessions">0</div>
-            <div class="hero-stat-label">Sessions logged</div>
+        <p class="hero-tagline">Free to use · Zero distractions · Built for calm deep work</p>
+
+        <!-- macOS App Window Mockup Showcase (Even 3x2 Grid) -->
+        <div class="showcase-window" aria-label="Renounce study dashboard preview">
+          <div class="window-header">
+            <div class="mac-traffic-lights" aria-hidden="true">
+              <span class="mac-dot red"></span>
+              <span class="mac-dot yellow"></span>
+              <span class="mac-dot green"></span>
+            </div>
+            <div class="window-url-bar">
+              <span aria-hidden="true">🔒</span>
+              <span>renounce.app/dashboard</span>
+            </div>
+            <div class="window-header-spacer"></div>
           </div>
-          <div class="hero-stat">
-            <div class="hero-stat-value" id="stat-streak">0</div>
-            <div class="hero-stat-label">Day streak</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-value" id="stat-deadlines">0</div>
-            <div class="hero-stat-label">Deadlines tracked</div>
+
+          <div class="showcase-grid">
+            <!-- Card 1: Next Best Step (Deep Work Focus Block) -->
+            <div class="showcase-card">
+              <a href="timer.html" class="card-banner" title="Launch focus timer">
+                <img src="/images/feature_focus_timer.jpg" alt="Minimalist focus timer on study desk" class="card-banner-img" />
+              </a>
+              <div class="card-body">
+                <div class="card-meta">
+                  <span class="meta-dot sage"></span>
+                  <span class="meta-source">focus.timer</span>
+                </div>
+                <h3 class="card-title" id="mockup-session-title">
+                  <a href="timer.html" id="suggested-task" class="card-title-link">Finish a 25-minute deep work block</a>
+                </h3>
+                <p id="suggested-task-meta" class="card-subtext">Use the timer to protect your next study window.</p>
+                <div class="card-tags">
+                  <span class="card-tag">pomodoro</span>
+                  <span class="card-tag" id="stat-sessions">0 logged</span>
+                  <a href="timer.html" class="card-tag card-tag-action">Open timer →</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: The Distraction Shield (Pledge: Phone & Tabs) -->
+            <div class="showcase-card">
+              <a href="timer.html" class="card-banner" title="View focus pledge">
+                <img src="/images/distraction_shield.jpg" alt="Distraction Shield protecting smartphone" class="card-banner-img" />
+              </a>
+              <div class="card-body">
+                <div class="card-meta">
+                  <span class="meta-dot indigo"></span>
+                  <span class="meta-source">distraction.shield</span>
+                </div>
+                <h3 class="card-title" id="mockup-pledge-title">
+                  <a href="timer.html" class="card-title-link">The Pledge: Phone &amp; tabs</a>
+                </h3>
+                <p class="card-subtext">Renounce impulsive checking and protect your deep focus space.</p>
+                <div class="card-tags">
+                  <span class="card-tag">resisted</span>
+                  <span class="card-tag">shield active</span>
+                  <a href="timer.html" class="card-tag card-tag-action">Take pledge →</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Upcoming Deadlines (Milestones) -->
+            <div class="showcase-card">
+              <a href="deadlines.html" class="card-banner" title="Track study deadlines">
+                <img src="/images/study_deadlines.jpg" alt="Study milestones and planner journal" class="card-banner-img" />
+              </a>
+              <div class="card-body">
+                <div class="card-meta">
+                  <span class="meta-dot amber"></span>
+                  <span class="meta-source">study.deadlines</span>
+                </div>
+                <h3 class="card-title" id="mockup-deadline-title">
+                  <a href="deadlines.html" class="card-title-link">Next best study target</a>
+                </h3>
+                <ul id="upcoming-deadlines" class="card-deadlines-list">
+                  <li>No upcoming deadlines yet.</li>
+                </ul>
+                <div class="card-tags">
+                  <span class="card-tag">milestone</span>
+                  <span class="card-tag" id="stat-deadlines">0 tracked</span>
+                  <a href="deadlines.html" class="card-tag card-tag-action">Manage →</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Consistency (28-day Study Rhythm) -->
+            <div class="showcase-card showcase-card-rhythm" tabindex="0" aria-haspopup="true" aria-expanded="false">
+              <a href="timer.html" class="card-banner" title="View study rhythm">
+                <img src="/images/study_rhythm.jpg" alt="Daily focus habit rhythm matrix display" class="card-banner-img" />
+              </a>
+              <div class="card-body">
+                <div class="card-meta">
+                  <span class="meta-dot slate"></span>
+                  <span class="meta-source">rhythm.matrix</span>
+                  <span class="badge-subtle" id="consistency-badge" style="margin-left: auto; font-size: 0.65rem; padding: 0.1rem 0.45rem;">Quiet Momentum</span>
+                </div>
+                <h3 class="card-title" id="mockup-streak-title">
+                  <span id="streak-count">0 days streak</span>
+                </h3>
+                <p id="rhythm-summary" class="card-subtext">Showing up for one intentional session builds lasting rhythm.</p>
+                <div class="card-tags">
+                  <span class="card-tag">momentum</span>
+                  <span class="card-tag" id="stat-streak">0 days</span>
+                  <span class="card-tag card-tag-action rhythm-popout-hint">Hover for 28-day grid ▾</span>
+                </div>
+              </div>
+
+              <!-- Floating Popout: 28-day Study Rhythm Grid (Reveals on Tile Hover) -->
+              <div class="rhythm-popout" id="rhythm-popout" role="tooltip" aria-label="28-day study rhythm matrix">
+                <div class="rhythm-popout-header">
+                  <span class="rhythm-popout-title">28-Day Study Rhythm</span>
+                  <span class="badge-subtle" style="font-size: 0.65rem;">Hover cells for details</span>
+                </div>
+                <div class="rhythm-matrix" id="rhythm-matrix" aria-label="Last 28 days study activity"></div>
+                <div class="rhythm-legend">
+                  <span>Activity rhythm</span>
+                  <div class="rhythm-legend-dots" title="Activity level: None to High">
+                    <span class="rhythm-legend-dot" style="background: var(--surface-subtle); border: 1px solid var(--line-subtle);"></span>
+                    <span class="rhythm-legend-dot" style="background: #d4e5d8;"></span>
+                    <span class="rhythm-legend-dot" style="background: #87b593;"></span>
+                    <span class="rhythm-legend-dot" style="background: #335340;"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5: Check In With Yourself (Energy & Mood) -->
+            <div class="showcase-card">
+              <div class="card-banner">
+                <img src="/images/mindful_energy.jpg" alt="Mindful inner balance with river stones and matcha" class="card-banner-img" />
+              </div>
+              <div class="card-body">
+                <div class="card-meta">
+                  <span class="meta-dot teal"></span>
+                  <span class="meta-source">mindful.energy</span>
+                </div>
+                <h3 class="card-title">How is your energy?</h3>
+                <div class="mood-options" id="mood-options" style="display: flex; gap: 0.35rem; margin: 0.2rem 0;">
+                  <button type="button" class="mood-btn" data-mood="calm">Calm</button>
+                  <button type="button" class="mood-btn" data-mood="focused">Focused</button>
+                  <button type="button" class="mood-btn" data-mood="overwhelmed">Overwhelmed</button>
+                </div>
+                <p id="mood-status" class="card-subtext">Tap a feeling to save your current energy.</p>
+                <div class="card-tags">
+                  <span class="card-tag">mindful</span>
+                  <span class="card-tag">energy balance</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 6: Physical Study Companion (Desk Clock Mode) -->
+            <div class="showcase-card">
+              <a href="timer.html" class="card-banner" title="Launch ambient desk clock mode">
+                <img src="/images/desk_companion.jpg" alt="Study desk with textbooks, notebook, and glowing ambient clock" class="card-banner-img" />
+              </a>
+              <div class="card-body">
+                <div class="card-meta">
+                  <span class="meta-dot amber"></span>
+                  <span class="meta-source">desk.companion</span>
+                  <span class="badge-subtle" style="margin-left: auto; font-size: 0.65rem; padding: 0.1rem 0.45rem;">Aesthetic Idle</span>
+                </div>
+                <h3 class="card-title">
+                  <a href="timer.html" class="card-title-link">Study with physical books &amp; notebooks</a>
+                </h3>
+                <p class="card-subtext">Prop tablet beside your textbooks. Press <strong>D</strong> for ambient large numerals, warm candle glow, and rain audio.</p>
+                <div class="card-tags">
+                  <span class="card-tag">idle mode</span>
+                  <span class="card-tag">press D</span>
+                  <a href="timer.html" class="card-tag card-tag-action">Launch (D) →</a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
-
-      <section class="dashboard-grid">
-        <article class="card stat-card">
-          <p class="eyebrow">Next best step</p>
-          <h2 id="suggested-task">Finish a 25-minute deep work block</h2>
-          <p id="suggested-task-meta">Use the timer to protect your next study window.</p>
-          <a class="text-link" href="timer.html">Open focus timer <span>→</span></a>
-        </article>
-
-        <article class="card stat-card">
-          <p class="eyebrow">Upcoming deadlines</p>
-          <ul id="upcoming-deadlines" class="list-stack"></ul>
-        </article>
-
-        <article class="card stat-card">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <p class="eyebrow" style="margin: 0;">Consistency</p>
-            <span class="badge-subtle" id="consistency-badge">Quiet Momentum</span>
-          </div>
-          <h2 id="streak-count" style="margin: 0.5rem 0 0.25rem;">0 days streak</h2>
-          <p id="rhythm-summary" class="muted" style="margin: 0 0 0.75rem; font-size: 0.85rem;">
-            Showing up for one intentional session builds lasting rhythm.
-          </p>
-          <div class="rhythm-matrix" id="rhythm-matrix" aria-label="Last 28 days study activity"></div>
-          <div class="rhythm-legend">
-            <span>28-day study rhythm</span>
-            <div class="rhythm-legend-dots" title="Activity level: None to High">
-              <span class="rhythm-legend-dot" style="background: var(--surface-subtle); border: 1px solid var(--line-subtle);"></span>
-              <span class="rhythm-legend-dot" style="background: #d4e5d8;"></span>
-              <span class="rhythm-legend-dot" style="background: #87b593;"></span>
-              <span class="rhythm-legend-dot" style="background: #335340;"></span>
-            </div>
-          </div>
-        </article>
-
-        <article class="card stat-card mood-card">
-          <p class="eyebrow">Check in with yourself</p>
-          <h2>How is your energy?</h2>
-          <div class="mood-options" id="mood-options">
-            <button class="mood-btn" data-mood="calm">Calm</button>
-            <button class="mood-btn" data-mood="focused">Focused</button>
-            <button class="mood-btn" data-mood="overwhelmed">Overwhelmed</button>
-          </div>
-          <p id="mood-status">Tap a feeling to save your current energy.</p>
-        </article>
-
-        <!-- Ambient Desk Mode Feature Showcase -->
-        <article class="card stat-card" style="grid-column: span 12; display: flex; flex-direction: row; flex-wrap: wrap; gap: 1.5rem; align-items: center; padding: 1.35rem;">
-          <div style="flex: 1; min-width: 280px;">
-            <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.4rem;">
-              <p class="eyebrow" style="margin: 0;">Physical Study Companion</p>
-              <span class="badge-subtle">Aesthetic Idle Mode</span>
-            </div>
-            <h2 style="margin: 0 0 0.5rem; font-size: 1.3rem;">Study with physical books & notebooks.</h2>
-            <p class="muted" style="margin: 0 0 1.1rem; font-size: 0.88rem; line-height: 1.55;">
-              Prop your laptop or tablet on your desk beside your textbooks and notebook. Press <strong>D</strong> on the timer to enter ambient Desk Clock mode with large tabular numerals, warm candle glow lighting, and procedural rain or brown noise.
-            </p>
-            <a href="timer.html" class="btn btn-secondary" style="font-size: 0.82rem;">Launch Focus Space (D) →</a>
-          </div>
-          <div style="width: 100%; max-width: 380px; border-radius: var(--radius-sm); overflow: hidden; border: 1.5px solid var(--line); aspect-ratio: 16/9; box-shadow: var(--shadow);">
-            <img src="/images/desk_clock_cozy.jpg" alt="Cozy night study desk with physical textbooks and iPad in ambient desk clock mode" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" />
-          </div>
-        </article>
       </section>
     </main>
 

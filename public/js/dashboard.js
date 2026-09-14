@@ -168,15 +168,42 @@
       fetchMood()
     ]);
 
+    const streak = getStreak(sessions);
     const streakEl = document.getElementById('streak-count');
     const statSessionsEl = document.getElementById('stat-sessions');
     const statStreakEl = document.getElementById('stat-streak');
     const statDeadlinesEl = document.getElementById('stat-deadlines');
 
-    if (streakEl) streakEl.textContent = `${getStreak(sessions)} days streak`;
-    if (statSessionsEl) statSessionsEl.textContent = sessions.length;
-    if (statStreakEl) statStreakEl.textContent = getStreak(sessions);
-    if (statDeadlinesEl) statDeadlinesEl.textContent = deadlines.length;
+    if (streakEl) streakEl.textContent = `${streak} days streak`;
+    if (statSessionsEl) statSessionsEl.textContent = `${sessions.length} logged`;
+    if (statStreakEl) statStreakEl.textContent = `${streak} days`;
+    if (statDeadlinesEl) statDeadlinesEl.textContent = `${deadlines.length} tracked`;
+
+    const mockupSessionTitle = document.getElementById('mockup-session-title');
+    const mockupPledgeTitle = document.getElementById('mockup-pledge-title');
+    const mockupDeadlineTitle = document.getElementById('mockup-deadline-title');
+    const mockupStreakTitle = document.getElementById('mockup-streak-title');
+
+    if (mockupSessionTitle && sessions.length > 0) {
+      const last = sessions[sessions.length - 1];
+      mockupSessionTitle.textContent = `${last.task || 'Focus block'} · ${last.minutes || 25}m`;
+    }
+
+    const currentPledge = localStorage.getItem('renounce_current_pledge') || 'Phone & tabs';
+    if (mockupPledgeTitle) {
+      mockupPledgeTitle.textContent = `Renounced: ${currentPledge}`;
+    }
+
+    const nextDeadline = deadlines
+      .filter((d) => !d.isCompleted)
+      .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))[0];
+    if (mockupDeadlineTitle && nextDeadline) {
+      mockupDeadlineTitle.textContent = `Prepare ${nextDeadline.title}`;
+    }
+
+    if (mockupStreakTitle) {
+      mockupStreakTitle.textContent = streak > 0 ? `${streak}-day study streak active` : 'Start today to build rhythm';
+    }
 
     renderSuggestedTask(deadlines);
     renderDeadlines(deadlines);
@@ -194,6 +221,42 @@
           status.textContent = `Saved mood: ${moodVal.charAt(0).toUpperCase() + moodVal.slice(1)}.`;
         }
       });
+    });
+
+    setupRhythmPopout();
+  }
+
+  function setupRhythmPopout() {
+    const card = document.querySelector('.showcase-card-rhythm');
+    const popout = document.getElementById('rhythm-popout');
+    if (!card || !popout) return;
+
+    function updatePlacement() {
+      const rect = card.getBoundingClientRect();
+      if (rect.top < 240) {
+        card.classList.add('popout-below');
+      } else {
+        card.classList.remove('popout-below');
+      }
+    }
+
+    card.addEventListener('mouseenter', updatePlacement);
+    card.addEventListener('focusin', updatePlacement);
+
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('a') || e.target.closest('button')) return;
+      if (window.matchMedia && window.matchMedia('(hover: none)').matches) {
+        updatePlacement();
+        const active = card.classList.toggle('popout-active');
+        card.setAttribute('aria-expanded', active ? 'true' : 'false');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!card.contains(e.target)) {
+        card.classList.remove('popout-active');
+        card.setAttribute('aria-expanded', 'false');
+      }
     });
   }
 
