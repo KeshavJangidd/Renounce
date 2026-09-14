@@ -299,9 +299,9 @@ function handleGoogleLogin(req, res, email, explicitName) {
   req.login(normalized, (err) => {
     if (err) {
       console.error('Google login error:', err);
-      return res.redirect('/login.html?error=google');
+      return res.redirect('/login?error=google');
     }
-    return res.redirect('/index.html');
+    return res.redirect('/home');
   });
 }
 
@@ -538,7 +538,7 @@ function renderGoogleAccountChooser(req, res) {
     </div>
 
     <div class="card-footer">
-      <a href="/login.html" class="cancel-link">← Return to Renounce login</a>
+      <a href="/login" class="cancel-link">← Return to Renounce login</a>
     </div>
 
     <div class="dev-badge">
@@ -575,11 +575,11 @@ router.post('/google', (req, res) => {
 
 router.get('/google/callback', (req, res, next) => {
   if (!ensureGoogleStrategy()) {
-    return res.redirect('/login.html?error=google');
+    return res.redirect('/login?error=google');
   }
-  return passport.authenticate('google', { failureRedirect: '/login.html?error=google' })(req, res, (err) => {
-    if (err) return res.redirect('/login.html?error=google');
-    return res.redirect('/index.html');
+  return passport.authenticate('google', { failureRedirect: '/login?error=google' })(req, res, (err) => {
+    if (err) return res.redirect('/login?error=google');
+    return res.redirect('/home');
   });
 });
 

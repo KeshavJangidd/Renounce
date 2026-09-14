@@ -118,7 +118,7 @@
               showSuccess(`Welcome, ${data.name || 'there'}! Redirecting...`);
               await new Promise((resolve) => setTimeout(resolve, 500));
             }
-            window.location.href = '/index.html';
+            window.location.href = '/home';
           } catch (err) {
             console.error('Auth request failed:', err);
             showError(err.message || 'Network error. Try again.');

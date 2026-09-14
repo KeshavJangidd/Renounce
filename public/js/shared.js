@@ -18,21 +18,21 @@
 
   const headerMarkup = `
     <header class="site-header">
-      <a class="brand" href="index.html">
+      <a class="brand" href="/home">
         <img class="brand-mascot" src="images/renounce-avatar.png" alt="Renounce mascot" />
         <span>Renounce</span>
       </a>
       <div class="header-actions">
         <nav class="nav-links" aria-label="Primary navigation">
-          <a href="index.html">Home</a>
-          <a href="timer.html">Focus Timer</a>
-          <a href="deadlines.html">Deadlines</a>
-          <a href="journal.html">Daily Journal</a>
-          <a href="achievements.html">Achievements</a>
+          <a href="/home">Home</a>
+          <a href="/timer">Focus Timer</a>
+          <a href="/deadlines">Deadlines</a>
+          <a href="/journal">Daily Journal</a>
+          <a href="/achievements">Achievements</a>
         </nav>
         <div class="auth-actions">
-          <a class="nav-auth-btn" id="nav-auth-btn" href="login.html">Log in / Sign up</a>
-          <a class="account-pill" id="account-pill" href="account.html" style="display:none;" aria-label="Open account details"></a>
+          <a class="nav-auth-btn" id="nav-auth-btn" href="/login">Log in / Sign up</a>
+          <a class="account-pill" id="account-pill" href="/account" style="display:none;" aria-label="Open account details"></a>
         </div>
         <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
           <span class="theme-toggle-icon" aria-hidden="true">☾</span>
@@ -50,7 +50,7 @@
     </footer>
   `;
 
-  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+  const currentPath = window.location.pathname.split('/').pop() || 'home';
   const publicPages = ['login.html'];
 
   if (!publicPages.includes(currentPath)) {
@@ -61,7 +61,7 @@
     const navLinks = document.querySelectorAll('.nav-links a');
     navLinks.forEach((link) => {
       const href = link.getAttribute('href');
-      if (href === currentPath || (currentPath === '' && href === 'index.html')) {
+      if (href === window.location.pathname || (currentPath === 'index.html' && href === '/home')) {
         link.classList.add('active');
       }
     });

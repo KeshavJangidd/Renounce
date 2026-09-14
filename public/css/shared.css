@@ -119,6 +119,24 @@ body {
   background-color: var(--bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  animation: page-enter 90ms ease-out both;
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+  }
 }
 
 a {
@@ -2249,5 +2267,3 @@ body.desk-clock-scene-active .desk-clock-bar {
 body.desk-clock-scene-active .desk-clock-bar button {
   color: #f0ddd0 !important;
 }
-
-

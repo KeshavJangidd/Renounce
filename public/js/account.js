@@ -263,7 +263,7 @@
           }, 3500);
         } else {
           if (res.status === 401) {
-            if (saveStatus) saveStatus.innerHTML = '<span style="color: var(--ink);">Saved locally. Session expired — <a href="login.html" style="text-decoration: underline; font-weight: 600;">log in to sync with server →</a></span>';
+            if (saveStatus) saveStatus.innerHTML = '<span style="color: var(--ink);">Saved locally. Session expired — <a href="/login" style="text-decoration: underline; font-weight: 600;">log in to sync with server →</a></span>';
           } else {
             const errData = await res.json().catch(() => ({}));
             if (saveStatus) saveStatus.textContent = errData.error || `Saved locally. (Server status: ${res.status})`;
@@ -315,7 +315,7 @@
           }, 3500);
         } else {
           if (res.status === 401) {
-            if (personalSaveStatus) personalSaveStatus.innerHTML = '<span style="color: var(--ink);">Saved locally. Session expired — <a href="login.html" style="text-decoration: underline; font-weight: 600;">log in to sync with server →</a></span>';
+            if (personalSaveStatus) personalSaveStatus.innerHTML = '<span style="color: var(--ink);">Saved locally. Session expired — <a href="/login" style="text-decoration: underline; font-weight: 600;">log in to sync with server →</a></span>';
           } else {
             const errData = await res.json().catch(() => ({}));
             if (personalSaveStatus) personalSaveStatus.textContent = errData.error || `Saved locally. (Server status: ${res.status})`;
@@ -333,7 +333,7 @@
       await apiFetch('/api/auth/logout', { method: 'POST' });
     } catch (_) {}
     localStorage.removeItem('renounce_profile');
-    window.location.href = 'index.html';
+    window.location.href = '/home';
   }
 
   const logoutBtn = document.getElementById('logout-btn');
@@ -351,11 +351,10 @@
         const user = await res.json();
         populateUserData(user);
       } else if (res.status === 401 && saveStatus) {
-        saveStatus.innerHTML = 'Not signed in. <a href="login.html" style="color: var(--ink); text-decoration: underline; font-weight: 600;">Sign in to sync your profile →</a>';
+        saveStatus.innerHTML = 'Not signed in. <a href="/login" style="color: var(--ink); text-decoration: underline; font-weight: 600;">Sign in to sync your profile →</a>';
       }
     } catch (err) {
       // Offline or local preview
     }
   })();
 })();
-

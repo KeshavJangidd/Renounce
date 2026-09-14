@@ -148,6 +148,28 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Clean page routes, with redirects for existing .html bookmarks.
+const cleanPages = {
+  '/home': 'index.html',
+  '/timer': 'timer.html',
+  '/deadlines': 'deadlines.html',
+  '/journal': 'journal.html',
+  '/achievements': 'achievements.html',
+  '/login': 'login.html',
+  '/account': 'account.html'
+};
+const legacyPageRoutes = Object.fromEntries(
+  Object.entries(cleanPages).map(([route, file]) => [`/${file}`, route])
+);
+
+app.get(['/', '/index.html'], (req, res) => res.redirect(302, '/home'));
+Object.entries(legacyPageRoutes).forEach(([legacyRoute, cleanRoute]) => {
+  if (legacyRoute !== '/index.html') app.get(legacyRoute, (req, res) => res.redirect(302, cleanRoute));
+});
+Object.entries(cleanPages).forEach(([route, file]) => {
+  app.get(route, (req, res) => res.sendFile(path.join(process.cwd(), 'public', file)));
+});
+
 app.use(express.static(path.join(process.cwd(), 'public')));
 
 app.use('/api/auth', authRoutes);
