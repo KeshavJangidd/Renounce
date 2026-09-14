@@ -1,3 +1,9 @@
+try {
+  if (typeof process.loadEnvFile === 'function') {
+    process.loadEnvFile();
+  }
+} catch (_) {}
+
 const express = require('express');
 const session = require('express-session');
 const passport = require('passport');
@@ -5,19 +11,84 @@ const path = require('path');
 const helmet = require('helmet');
 const authRoutes = require('./routes/auth');
 const apiRoutes = require('./routes/api');
-const { ensureStorage } = require('./lib/storage');
+const { ensureStorage, loadStorage, saveStorage } = require('./lib/storage');
+
+class FileStore extends session.Store {
+  constructor(options = {}) {
+    super(options);
+  }
+
+  get(sid, cb) {
+    try {
+      const data = loadStorage();
+      const sessions = data.sessions || {};
+      const sess = sessions[sid];
+      if (!sess) return cb(null, null);
+      if (sess.cookie && sess.cookie.expires) {
+        if (new Date(sess.cookie.expires) < new Date()) {
+          delete sessions[sid];
+          saveStorage(data);
+          return cb(null, null);
+        }
+      }
+      return cb(null, sess);
+    } catch (err) {
+      return cb(err);
+    }
+  }
+
+  set(sid, sess, cb) {
+    try {
+      const data = loadStorage();
+      if (!data.sessions) data.sessions = {};
+      data.sessions[sid] = sess;
+      saveStorage(data);
+      if (cb) cb(null);
+    } catch (err) {
+      if (cb) cb(err);
+    }
+  }
+
+  destroy(sid, cb) {
+    try {
+      const data = loadStorage();
+      if (data.sessions && data.sessions[sid]) {
+        delete data.sessions[sid];
+        saveStorage(data);
+      }
+      if (cb) cb(null);
+    } catch (err) {
+      if (cb) cb(err);
+    }
+  }
+
+  touch(sid, sess, cb) {
+    try {
+      const data = loadStorage();
+      if (data.sessions && data.sessions[sid]) {
+        data.sessions[sid].cookie = sess.cookie;
+        saveStorage(data);
+      }
+      if (cb) cb(null);
+    } catch (err) {
+      if (cb) cb(err);
+    }
+  }
+}
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3001;
 const isProduction = process.env.NODE_ENV === 'production';
-const frontendUrl = process.env.FRONTEND_URL || 'https://renouncework.vercel.app';
+const frontendUrl = process.env.FRONTEND_URL || '';
 const allowedOrigins = new Set([
-  frontendUrl,
   'http://localhost:3000',
   'http://localhost:3001',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:3001'
 ]);
+if (frontendUrl) {
+  allowedOrigins.add(frontendUrl);
+}
 
 ensureStorage();
 
@@ -63,13 +134,15 @@ app.use((req, res, next) => {
 });
 
 app.use(session({
+  store: new FileStore(),
   secret: process.env.SESSION_SECRET || 'renounce-session-secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax',
-    maxAge: 1000 * 60 * 60 * 24 * 7
+    sameSite: 'lax',
+    maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days persistent session
+    httpOnly: true
   }
 }));
 app.use(passport.initialize());

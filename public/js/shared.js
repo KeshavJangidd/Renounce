@@ -4,10 +4,11 @@
   const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   const activeTheme = savedTheme || preferredTheme;
   document.documentElement.dataset.theme = activeTheme;
-  const isLocalhost = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || window.location.protocol === 'file:';
-  const apiBaseUrl = window.RENOUNCE_API_URL || (isLocalhost
-    ? (window.location.port === '3001' ? '' : 'http://localhost:3001')
-    : 'https://renounce.onrender.com');
+  const isPort3000 = window.location.port === '3000';
+  const isFileProto = window.location.protocol === 'file:';
+  const apiBaseUrl = window.RENOUNCE_API_URL || (
+    isPort3000 || isFileProto ? 'http://localhost:3001' : ''
+  );
 
   window.apiUrl = (endpoint) => `${apiBaseUrl}${endpoint}`;
   window.apiFetch = (endpoint, options = {}) => fetch(window.apiUrl(endpoint), {
@@ -23,13 +24,16 @@
       </a>
       <div class="header-actions">
         <nav class="nav-links" aria-label="Primary navigation">
-          <a href="index.html">Dashboard</a>
+          <a href="index.html">Home</a>
           <a href="timer.html">Focus Timer</a>
           <a href="deadlines.html">Deadlines</a>
           <a href="journal.html">Daily Journal</a>
           <a href="achievements.html">Achievements</a>
         </nav>
-        <a class="account-pill" id="account-pill" href="account.html" style="display:none;" aria-label="Open account details"></a>
+        <div class="auth-actions">
+          <a class="nav-auth-btn" id="nav-auth-btn" href="login.html">Log in / Sign up</a>
+          <a class="account-pill" id="account-pill" href="account.html" style="display:none;" aria-label="Open account details"></a>
+        </div>
         <button class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
           <span class="theme-toggle-icon" aria-hidden="true">☾</span>
         </button>
@@ -57,7 +61,7 @@
     const navLinks = document.querySelectorAll('.nav-links a');
     navLinks.forEach((link) => {
       const href = link.getAttribute('href');
-      if (href === currentPath) {
+      if (href === currentPath || (currentPath === '' && href === 'index.html')) {
         link.classList.add('active');
       }
     });
@@ -79,52 +83,61 @@
       updateThemeToggle(nextTheme);
     });
 
-    // Instant local cache population for account pill
+    const authBtn = document.getElementById('nav-auth-btn');
+    const pill = document.getElementById('account-pill');
+
+    function setLoggedInUI(nameOrEmail) {
+      if (pill) {
+        pill.textContent = nameOrEmail || 'Account';
+        pill.style.display = 'inline-flex';
+        if (currentPath === 'account.html') {
+          pill.classList.add('active');
+          pill.setAttribute('aria-current', 'page');
+        }
+      }
+      if (authBtn) authBtn.style.display = 'none';
+    }
+
+    function setLoggedOutUI() {
+      if (pill) pill.style.display = 'none';
+      if (authBtn) authBtn.style.display = 'inline-flex';
+      localStorage.removeItem('renounce_profile');
+    }
+
+    // Instant local cache population for account pill if previously logged in
     try {
       const cached = JSON.parse(localStorage.getItem('renounce_profile') || '{}');
       if (cached.name || cached.email) {
-        const pill = document.getElementById('account-pill');
-        if (pill) {
-          pill.textContent = cached.name || cached.email;
-          pill.style.display = 'inline-flex';
-          if (currentPath === 'account.html') {
-            pill.classList.add('active');
-            pill.setAttribute('aria-current', 'page');
-          }
-        }
+        setLoggedInUI(cached.name || cached.email);
       }
     } catch (_) {}
 
-    // Auth check: redirect to login if not signed in (skip on the login page itself),
-    // and show the logged-in user's name in the nav pill
+    // Check server auth state without forced redirects on Home page or refresh
     window.apiFetch('/api/auth/me').then((res) => {
-      if (!res.ok) {
-        window.location.href = 'login.html';
-        return null;
+      if (res.ok) {
+        return res.json();
       }
-      return res.json();
+      return null;
     }).then((user) => {
-      if (!user) return;
-      const pill = document.getElementById('account-pill');
-      pill.textContent = user.name || user.email;
-      pill.style.display = 'inline-flex';
-      if (currentPath === 'account.html') {
-        pill.classList.add('active');
-        pill.setAttribute('aria-current', 'page');
+      if (user) {
+        setLoggedInUI(user.name || user.email);
+        try {
+          const existing = JSON.parse(localStorage.getItem('renounce_profile') || '{}');
+          localStorage.setItem('renounce_profile', JSON.stringify({
+            ...existing,
+            name: user.name,
+            email: user.email,
+            age: user.age,
+            purpose: user.purpose,
+            phone: user.phone
+          }));
+        } catch (_) {}
+      } else {
+        // Not logged in: show slightly visible Log in / Sign up button
+        setLoggedOutUI();
       }
-      try {
-        const existing = JSON.parse(localStorage.getItem('renounce_profile') || '{}');
-        localStorage.setItem('renounce_profile', JSON.stringify({
-          ...existing,
-          name: user.name,
-          email: user.email,
-          age: user.age,
-          purpose: user.purpose,
-          phone: user.phone
-        }));
-      } catch (_) {}
     }).catch(() => {
-      window.location.href = 'login.html';
+      // Offline / server waking up: keep existing cached state, do not redirect
     });
   }
 })();

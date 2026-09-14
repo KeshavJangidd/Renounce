@@ -8,14 +8,17 @@ const DB_FILE = process.env.DATA_FILE
 function ensureStorage() {
   fs.mkdirSync(path.dirname(DB_FILE), { recursive: true });
   if (!fs.existsSync(DB_FILE)) {
-    fs.writeFileSync(DB_FILE, JSON.stringify({ users: [] }, null, 2));
+    fs.writeFileSync(DB_FILE, JSON.stringify({ users: [], sessions: {} }, null, 2));
   }
 }
 
 function loadStorage() {
   ensureStorage();
   const raw = fs.readFileSync(DB_FILE, 'utf-8');
-  return JSON.parse(raw);
+  const parsed = JSON.parse(raw);
+  if (!parsed.users) parsed.users = [];
+  if (!parsed.sessions) parsed.sessions = {};
+  return parsed;
 }
 
 function saveStorage(data) {

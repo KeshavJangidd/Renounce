@@ -242,6 +242,43 @@ hr {
   gap: 0.5rem;
 }
 
+.auth-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.nav-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.32rem 0.72rem;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: var(--accent-text);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  opacity: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.nav-auth-btn:hover {
+  opacity: 1;
+  color: var(--accent-text);
+  background: var(--accent-tint);
+  border-color: var(--accent-tint);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.nav-auth-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .account-pill {
   display: inline-flex;
   align-items: center;
@@ -1048,6 +1085,24 @@ textarea:focus-visible,
   color: var(--ink);
   background: var(--surface-subtle);
   border-color: var(--line-strong);
+}
+
+.btn-danger {
+  color: #ffffff !important;
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.25);
+}
+
+.btn-danger:hover {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+  box-shadow: 0 2px 6px rgba(185, 28, 28, 0.35);
+}
+
+.btn-danger:active {
+  transform: translateY(1px);
 }
 
 .button-row {
@@ -2194,6 +2249,5 @@ body.desk-clock-scene-active .desk-clock-bar {
 body.desk-clock-scene-active .desk-clock-bar button {
   color: #f0ddd0 !important;
 }
-
 
 

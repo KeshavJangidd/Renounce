@@ -333,13 +333,15 @@
       await apiFetch('/api/auth/logout', { method: 'POST' });
     } catch (_) {}
     localStorage.removeItem('renounce_profile');
-    window.location.href = '/login.html';
+    window.location.href = 'index.html';
   }
 
   const logoutBtn = document.getElementById('logout-btn');
   const logoutBtnPersonal = document.getElementById('logout-btn-personal');
+  const logoutBtnSide = document.getElementById('logout-btn-side');
   if (logoutBtn) logoutBtn.addEventListener('click', handleLogout);
   if (logoutBtnPersonal) logoutBtnPersonal.addEventListener('click', handleLogout);
+  if (logoutBtnSide) logoutBtnSide.addEventListener('click', handleLogout);
 
   // Fetch User Info in background to synchronize with server
   (async function fetchCurrentUser() {

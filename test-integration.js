@@ -56,7 +56,7 @@ async function runTests() {
 
     // 2. Static HTML & UI Deliveries
     const indexRes = await request('/index.html');
-    assert(indexRes.status === 200 && indexRes.text.includes('rhythm-matrix') && indexRes.text.includes('rhythm-legend'), 'Dashboard serves 28-day rhythm heatmap matrix');
+    assert(indexRes.status === 200 && indexRes.text.includes('rhythm-matrix') && indexRes.text.includes('rhythm-legend') && indexRes.text.includes('renounce.app/home'), 'Home page serves 28-day rhythm heatmap matrix and renounce.app/home showcase');
 
     const timerRes = await request('/timer.html');
     assert(timerRes.status === 200 && timerRes.text.includes('pledge-card') && timerRes.text.includes('ambient-dock') && timerRes.text.includes('parking-lot-backdrop') && timerRes.text.includes('desk-clock-overlay') && timerRes.text.includes('desk-clock-scene-btn') && timerRes.text.includes('desk-clock-scene-backdrop'), 'Focus Timer serves The Pledge, Ambient Dock, Parking Lot modal, Desk Clock overlay, and Cozy Scene backdrop');
@@ -65,7 +65,13 @@ async function runTests() {
     assert(journalRes.status === 200 && journalRes.text.includes('journal-parking-list') && journalRes.text.includes('Impulses Resisted'), 'Daily Journal serves Parked Thoughts / Impulses Resisted card');
 
     const cssRes = await request('/css/shared.css');
-    assert(cssRes.status === 200 && cssRes.text.includes('.pledge-pill') && cssRes.text.includes('.ambient-dock') && cssRes.text.includes('.desk-clock-overlay') && cssRes.text.includes('.dim-mode-candle') && cssRes.text.includes('.desk-clock-scene-backdrop') && cssRes.text.includes('desk-clock-scene-active'), 'shared.css includes all Phase 3 & Cozy Desk Scene styles (Pledge, Ambient, Desk Clock, Candle glow, Scene backdrop)');
+    assert(cssRes.status === 200 && cssRes.text.includes('.pledge-pill') && cssRes.text.includes('.ambient-dock') && cssRes.text.includes('.desk-clock-overlay') && cssRes.text.includes('.dim-mode-candle') && cssRes.text.includes('.desk-clock-scene-backdrop') && cssRes.text.includes('desk-clock-scene-active') && cssRes.text.includes('.nav-auth-btn') && cssRes.text.includes('.btn-danger'), 'shared.css includes all Phase 3 & Cozy Desk Scene styles, .nav-auth-btn, and .btn-danger');
+
+    const jsSharedRes = await request('/js/shared.js');
+    assert(jsSharedRes.status === 200 && jsSharedRes.text.includes('>Home<') && jsSharedRes.text.includes('nav-auth-btn') && !jsSharedRes.text.includes('nav-logout-btn'), 'shared.js serves Home nav link, nav-auth-btn, and no header logout button');
+
+    const accountRes = await request('/account.html');
+    assert(accountRes.status === 200 && accountRes.text.includes('btn-danger') && accountRes.text.includes('logout-btn'), 'account.html serves red logout buttons at the bottom and in session card');
 
     const jsTimerRes = await request('/js/timer.js');
     assert(jsTimerRes.status === 200 && jsTimerRes.text.includes('ProceduralAmbientSound') && jsTimerRes.text.includes('startBrownNoise') && jsTimerRes.text.includes('startRain') && jsTimerRes.text.includes('startForest') && jsTimerRes.text.includes('startCandle') && jsTimerRes.text.includes('updateDeskSceneUI') && jsTimerRes.text.includes('openParkingLot'), 'timer.js contains procedural sound generators (including candle ember), parking lot, and desk clock cozy scene logic');
@@ -104,7 +110,18 @@ async function runTests() {
     const meRes = await request('/api/auth/me');
     assert(meRes.status === 200 && meRes.json?.email === testUserEmail, 'GET /api/auth/me returns authenticated user');
 
-    // 4. Session with The Pledge
+    // 4. Google Auth Flow (Chooser UI and simulated sign-in)
+    const googleChooserRes = await request('/api/auth/google');
+    assert(googleChooserRes.status === 200 && googleChooserRes.text.includes('Sign in with Google'), 'GET /api/auth/google serves Google Account Chooser screen (no 503 error)');
+
+    const googleUserEmail = `google_scholar_${Date.now()}@gmail.com`;
+    const googleAuthRes = await request(`/api/auth/google?email=${encodeURIComponent(googleUserEmail)}`, { redirect: 'manual' });
+    assert(googleAuthRes.status === 302 && googleAuthRes.headers.get('location') === '/index.html', 'GET /api/auth/google?email=... logs in and redirects to /index.html');
+
+    const googleMeRes = await request('/api/auth/me');
+    assert(googleMeRes.status === 200 && googleMeRes.json?.email === googleUserEmail && Boolean(googleMeRes.json?.googleId), 'GET /api/auth/me returns Google-authenticated user with googleId');
+
+    // 5. Session with The Pledge
     const sessionPost = await request('/api/sessions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -161,7 +178,7 @@ async function runTests() {
     // Clean up test user from data.json
     try {
       const data = loadStorage();
-      data.users = data.users.filter((u) => u.email !== testUserEmail);
+      data.users = data.users.filter((u) => u.email !== testUserEmail && !u.email.startsWith('google_scholar_'));
       saveStorage(data);
       console.log('  ✓ Cleaned up test user data.');
     } catch (_) {}

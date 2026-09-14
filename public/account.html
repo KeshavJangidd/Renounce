@@ -105,10 +105,20 @@
               <h3>Account Status</h3>
               <p class="muted">Signed in with <span id="account-provider">email</span>.</p>
               <div style="margin-top: 0.75rem;">
-                <button type="button" class="btn btn-ghost" id="logout-btn">Log out</button>
+                <button type="button" class="btn btn-danger" id="logout-btn-side">Log out</button>
               </div>
             </article>
           </div>
+        </section>
+
+        <!-- Danger / Logout Section Below -->
+        <section class="card" style="margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border: 1.5px solid rgba(220, 38, 38, 0.25); background: var(--surface);">
+          <div>
+            <p class="eyebrow" style="color: #dc2626; margin: 0 0 0.25rem;">Active Session</p>
+            <h3 style="margin: 0 0 0.25rem;">Sign out of Renounce</h3>
+            <p class="muted" style="margin: 0; font-size: 0.85rem;">Signing out ends your session on this browser. You can log back in anytime to continue.</p>
+          </div>
+          <button type="button" class="btn btn-danger" id="logout-btn">Log out</button>
         </section>
       </div>
 
@@ -159,9 +169,12 @@
 
           <hr style="margin: 1.5rem 0 1.25rem;" />
 
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <p class="muted" style="margin: 0; font-size: 0.82rem;">Need to switch accounts?</p>
-            <button type="button" class="btn btn-ghost" id="logout-btn-personal">Log out</button>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <p style="margin: 0; font-size: 0.88rem; font-weight: 600; color: var(--ink);">Sign out of your account</p>
+              <p class="muted" style="margin: 0; font-size: 0.82rem;">Need to switch accounts or end your active session?</p>
+            </div>
+            <button type="button" class="btn btn-danger" id="logout-btn-personal">Log out</button>
           </div>
         </section>
       </div>

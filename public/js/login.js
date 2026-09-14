@@ -78,7 +78,10 @@
         tabSignup.addEventListener('click', () => setMode('signup'));
         googleSignIn.addEventListener('click', (event) => {
           event.preventDefault();
-          window.location.href = window.apiUrl ? window.apiUrl('/api/auth/google') : '/api/auth/google';
+          const emailInput = document.getElementById('email-input');
+          const email = emailInput ? emailInput.value.trim() : '';
+          const baseUrl = window.apiUrl ? window.apiUrl('/api/auth/google') : '/api/auth/google';
+          window.location.href = email ? `${baseUrl}?email=${encodeURIComponent(email)}` : baseUrl;
         });
 
         form.addEventListener('submit', async (event) => {
@@ -126,6 +129,8 @@
 
         const params = new URLSearchParams(window.location.search);
         if (params.get('error') === 'google') {
-          showError('Google sign-in failed. Try again or use email.');
+          showError('Google sign-in was canceled or encountered an issue. Try again or use email.');
+        } else if (params.get('error') === 'google_not_configured') {
+          showError('Google OAuth is not configured in this environment yet. You can sign in using email and password.');
         }
       

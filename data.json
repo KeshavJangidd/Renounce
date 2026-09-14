@@ -66,5 +66,82 @@
       },
       "preferences": {}
     }
-  ]
+  ],
+  "sessions": {
+    "dd8AlRgZO_B8DMxa9BsFu-H2X3EbPpti": {
+      "cookie": {
+        "originalMaxAge": 2592000000,
+        "expires": "2026-10-14T08:16:45.023Z",
+        "secure": false,
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      },
+      "passport": {
+        "user": "user-1789373804946-ymksib"
+      }
+    },
+    "8R2C_Bp9CNFgX2OYwsHVwpMs0DC4c8Nw": {
+      "cookie": {
+        "originalMaxAge": 2592000000,
+        "expires": "2026-10-14T08:17:28.738Z",
+        "secure": false,
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      },
+      "passport": {
+        "user": "user-1789373848609-w4mzf9"
+      }
+    },
+    "EHqEa7Z-6jcNuacJmIMLY7_GmA-Y5va7": {
+      "cookie": {
+        "originalMaxAge": 2592000000,
+        "expires": "2026-10-14T08:24:42.721Z",
+        "secure": false,
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      },
+      "passport": {
+        "user": "user-1789374282586-b12zbu"
+      }
+    },
+    "UhSnXf3IONc17J-LuJHH5-IMaWi0Axh9": {
+      "cookie": {
+        "originalMaxAge": 2592000000,
+        "expires": "2026-10-14T08:24:55.160Z",
+        "secure": false,
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      },
+      "passport": {
+        "user": "user-1789374295087-nm2pvv"
+      }
+    },
+    "SJHB35MFzEDhf8bq-4wsByy7-nNJrc3E": {
+      "cookie": {
+        "originalMaxAge": 2592000000,
+        "expires": "2026-10-14T08:29:24.566Z",
+        "secure": false,
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      }
+    },
+    "d7eBOKdlOoZ8JoD3kKxTSuK0OPU9yd7w": {
+      "cookie": {
+        "originalMaxAge": 2592000000,
+        "expires": "2026-10-14T08:32:06.856Z",
+        "secure": false,
+        "httpOnly": true,
+        "path": "/",
+        "sameSite": "lax"
+      },
+      "passport": {
+        "user": "user-1789374726766-cpxx1w"
+      }
+    }
+  }
 }
