@@ -66,6 +66,24 @@
       }
     });
 
+    // Warm the browser cache for the other pages so navigation does not wait
+    // for the HTML request after the user clicks a tab.
+    const prefetchPage = (href) => {
+      if (href === window.location.pathname || document.querySelector(`link[rel="prefetch"][href="${href}"]`)) return;
+      const hint = document.createElement('link');
+      hint.rel = 'prefetch';
+      hint.href = href;
+      hint.as = 'document';
+      document.head.appendChild(hint);
+    };
+    navLinks.forEach((link) => {
+      const href = link.getAttribute('href');
+      link.addEventListener('pointerenter', () => prefetchPage(href), { once: true });
+      link.addEventListener('focus', () => prefetchPage(href), { once: true });
+    });
+    const schedulePrefetch = window.requestIdleCallback || ((callback) => setTimeout(callback, 250));
+    schedulePrefetch(() => navLinks.forEach((link) => prefetchPage(link.getAttribute('href'))));
+
     const themeToggle = document.querySelector('.theme-toggle');
 
     function updateThemeToggle(theme) {
