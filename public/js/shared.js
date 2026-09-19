@@ -54,6 +54,7 @@
   const publicPages = ['login.html'];
 
   if (!publicPages.includes(currentPath)) {
+    if (document.querySelector('.site-header')) return;
     const root = document.body;
     root.insertAdjacentHTML('afterbegin', headerMarkup);
     root.insertAdjacentHTML('beforeend', footerMarkup);

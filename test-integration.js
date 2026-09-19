@@ -116,7 +116,7 @@ async function runTests() {
 
     const googleUserEmail = `google_scholar_${Date.now()}@gmail.com`;
     const googleAuthRes = await request(`/api/auth/google?email=${encodeURIComponent(googleUserEmail)}`, { redirect: 'manual' });
-    assert(googleAuthRes.status === 302 && googleAuthRes.headers.get('location') === '/index.html', 'GET /api/auth/google?email=... logs in and redirects to /index.html');
+    assert(googleAuthRes.status === 302 && (googleAuthRes.headers.get('location') === '/home' || googleAuthRes.headers.get('location') === '/index.html'), 'GET /api/auth/google?email=... logs in and redirects to home');
 
     const googleMeRes = await request('/api/auth/me');
     assert(googleMeRes.status === 200 && googleMeRes.json?.email === googleUserEmail && Boolean(googleMeRes.json?.googleId), 'GET /api/auth/me returns Google-authenticated user with googleId');

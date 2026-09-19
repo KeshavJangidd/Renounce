@@ -2,8 +2,7 @@
   "name": "renounce",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
-  "engines": {
+   "engines": {
     "node": "20.x"
   },
   "scripts": {
